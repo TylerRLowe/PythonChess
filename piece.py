@@ -38,10 +38,10 @@ class king(piece):
         #those moves, pruning at each step; will add later
         if x < 7:
             if y < 7:
-                if (x+y*8) in enemyMoves:
+                if (x+1+(y+1)*8) in enemyMoves:
                     pass
                 elif layout[(x+1)+(y+1)*7].name() != "Empty":
-                    if layout[(x+1),(y+1)].color != this.color:
+                    if layout[(x+1)+(y+1)*7].color != self.color:
                         enemies.append([x+1,y+1])
                 else:
                     moves.append([x+1,y+1])
@@ -49,7 +49,7 @@ class king(piece):
                 if (x+1+(y-1)*8) in enemyMoves:
                     pass
                 elif layout[(x+1)+(y-1)*7].name() != "Empty":
-                    if layout[(x+1),(y-1)].color != this.color:
+                    if layout[(x+1)+(y-1)*7].color != self.color:
                         enemies.append([x+1,y-1])
                 else:
                     moves.append([x+1,y-1])
@@ -92,15 +92,24 @@ class wPawn(pawn):
         if y == 6: 
             if layout[x + 5*8].name() == "Empty":
                 moves.append([x,5])
-            if layout[x + 4*8].name() == "Empty":
-                moves.append([x,4])
-        elif y == 1:
-            #make this upgrade pawn to queen
-            pass
+                if layout[x + 4*8].name() == "Empty":
+                    moves.append([x,4])
         else: 
              if layout[x + (y-1)*8].name() == "Empty":
                 moves.append([x,y-1])
+        return moves + self.killSpots(x,y,layout,surface)
+    def killSpots(self,x,y,layout,surface):
+        moves =[]
+        if y > 0:
+            if x < 7:
+                if layout[x+1 + (y-1)*8].name() != "Empty" and (layout[x+1 + (y-1)*8].color != self.color):
+                    moves.append([x+1,y-1])
+            if x > 0:
+                if layout[x-1 + (y-1)*8].name() != "Empty" and (layout[x-1 + (y-1)*8].color != self.color):
+                    moves.append([x-1,y-1])
         return moves
+
+
 #wPawn = wPawn()
 class bPawn(pawn):
     def __init__(self):
@@ -111,10 +120,23 @@ class bPawn(pawn):
         moves = []
         if y < 7:
             if x < 7:
-                moves.append([x+1,y+1])
+                if layout[x+1 + (y+1)*8].name() != "Empty" and (layout[x+1 + (y+1)*8].color != self.color):
+                    moves.append([x+1,y-1])
             if x > 0:
-                moves.append([x-1,y+1])
+                if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
+                    moves.append([x-1,y-1])
         return moves
+        def validMoves(self,x,y, layout,surface):
+            moves = []
+            if y == 1: 
+                if layout[x + 2*8].name() == "Empty":
+                    moves.append([x,5])
+                    if layout[x + 3*8].name() == "Empty":
+                        moves.append([x,4])
+            else: 
+                if layout[x + (y+1)*8].name() == "Empty":
+                    moves.append([x,y+1])
+            return moves + self.killSpots(x,y,layout,surface)
 
 #bPawn = bPawn()
 
@@ -229,7 +251,7 @@ class empty(piece):
         return "Empty"
 #used for queen and bishop, checking empty squares on the four diagnols, stop on edge or peice, if enemy 
 #peice, while circle returns list of vaible moves, enemys always at the end 2d array
-def diagonalChecks(this,x,y,layout,surface):
+def diagonalChecks(self,x,y,layout,surface):
     moves = []
     enemies = []
     r = y
@@ -238,7 +260,7 @@ def diagonalChecks(this,x,y,layout,surface):
         if(r < 0):
             break
         if(layout[c + r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
             break
         moves.append([c,r])
     r = y
@@ -247,7 +269,7 @@ def diagonalChecks(this,x,y,layout,surface):
         if(r > 7):
             break
         if(layout[c +r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
             break
         moves.append([c,r])
 
@@ -257,7 +279,7 @@ def diagonalChecks(this,x,y,layout,surface):
         if(r < 0):
             break
         if(layout[c + r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
             break
         moves.append([c,r])
     r = y
@@ -266,34 +288,34 @@ def diagonalChecks(this,x,y,layout,surface):
         if(r > 7):
             break
         if(layout[c + r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
             break
         moves.append([c,r])
     while None in enemies:
         enemies.remove(None)
     return moves + enemies
 
-def rookMoveChecks(this,x,y,layout,surface):
+def rookMoveChecks(self,x,y,layout,surface):
     moves =[]
     enemies =[]
     for c in range(x-1,-1,-1):
         if(layout[c + y*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,y,layout,surface))
+            enemies.append(enemyCheck(self,c,y,layout,surface))
             break
         moves.append([c,y])
     for c in range(x+1,8,+1):
         if(layout[c + y*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,c,y,layout,surface))
+            enemies.append(enemyCheck(self,c,y,layout,surface))
             break
         moves.append([c,y])
     for r in range(y+1,8,+1):
         if(layout[x + r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,x,r,layout,surface))
+            enemies.append(enemyCheck(self,x,r,layout,surface))
             break
         moves.append([x,r])
     for r in range(y-1,-1,-1):
         if(layout[x + r*8].name() != "Empty"):
-            enemies.append(enemyCheck(this,x,r,layout,surface))
+            enemies.append(enemyCheck(self,x,r,layout,surface))
             break
         moves.append([x,r])
     r = y
@@ -301,35 +323,35 @@ def rookMoveChecks(this,x,y,layout,surface):
         enemies.remove(None)
     return moves + enemies
 
-def knightMoves(this,x,y,layout,surface):
+def knightMoves(self,x,y,layout,surface):
     moves =[]
     enemies = []
     c = x+1
     r = y+2
     if c < 8 and r < 8:
         if layout[c + r*8].name() != "Empty":
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
         else:
             moves.append([c,r])
     c = x-1
     r = y+2
     if c > -1 and r < 8:
         if layout[c + r*8].name() != "Empty":
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
         else:
             moves.append([c,r])
     c = x+1
     r = y-2
     if c < 8 and r > -1:
         if layout[c + r*8].name() != "Empty":
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
         else:
             moves.append([c,r])
     c = x-1
     r = y-2
     if c >-1  and r > -1:
         if layout[c + r*8].name() != "Empty":
-            enemies.append(enemyCheck(this,c,r,layout,surface))
+            enemies.append(enemyCheck(self,c,r,layout,surface))
         else:
             moves.append([c,r])
     while None in enemies:
@@ -347,8 +369,8 @@ def hollowCircle(x,y):
     pygame.draw.circle(circle, grey, (Radius, Radius), Radius,10)
     surface.blit(circle,(x*75,y*75))
 
-def enemyCheck(this,x,y,layout,surface):
-    if layout[x+y*8].color != this.color:
+def enemyCheck(self,x,y,layout,surface):
+    if layout[x+y*8].color != self.color:
         return [x,y]
     return None
 def numToSquare(num):
@@ -366,7 +388,7 @@ def enemyMoveCheker(self,layout):
     enemyMoves = set()
     i =0
     for piece in layout:
-        if piece.color != self.color and piece.name == "Pawn":
+        if piece.color != self.color and piece.name() == "Pawn":
             moves = piece.killSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
             for move in moves:
                 enemyMoves.add(move[0] + move[1]*8)

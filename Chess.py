@@ -44,9 +44,10 @@ for i in range(8):
     board.layout.append(bPawn)
 for i in range(10):
     board.layout.append(empty)
-board.layout.append(wKing)
+
 for i in range(21):
     board.layout.append(empty)
+board.layout.append(bKnight)
 for i in range(8):
     board.layout.append(wPawn)
 board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
