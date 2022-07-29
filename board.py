@@ -1,6 +1,6 @@
 #the piece can by found in the array by using board.layout[x+y*8] when represents the square\
 import pygame
-import piece
+import Piece
 white = pygame.Color(255,255,255)
 black = pygame.Color(0,0,0)
 cream = pygame.Color(235,230,208)
@@ -13,7 +13,7 @@ class board:
         self.surface = surface
     def layout(self):
         pass
-    def create(self,hasPieceSelected,pieceSelectedLocation):
+    def create(self,hasPieceSelected,pieceSelectedLocation,check):
         x = 0
         y = 0
         #wiping the screen (removes previous pieces)
@@ -34,7 +34,7 @@ class board:
             ySquare = pieceSelectedLocation[1]
             pygame.draw.rect(self.surface,lightBlue,(xSquare*75,ySquare*75,75,75))
             moves = self.layout[xSquare+ySquare*8].validMoves(xSquare,ySquare,self.layout,self.surface)
-            piece.circlePlacer(self,moves,self.layout[xSquare + ySquare*8].color,self.layout,self.surface)          
+            Piece.circlePlacer(self,moves,self.layout[xSquare + ySquare*8].color,self.layout,self.surface)          
         self.populate()
          ##placing the pieces
     def populate(self):

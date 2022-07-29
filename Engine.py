@@ -1,4 +1,5 @@
 import pygame
-import piece
+import Piece
+import board
 def move(layout):
     pass

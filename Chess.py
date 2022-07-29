@@ -1,5 +1,5 @@
 import pygame 
-import piece
+import Piece
 from pygame.locals import *
 import Engine
 import board
@@ -15,28 +15,27 @@ grey = pygame.Color(84,84,84,200)
 surface.fill(green)
 pygame.display.set_caption("Chess")
 FPS = 60
+Piece.surface = surface
 FramePerSec = pygame.time.Clock()
-piece.surface = surface
 hasPieceSelected= False
-pieceSelectedLocation =[]
 playerTurn = True
-Check = False
+check = False
 # pices
 Radius = 25
 circle = pygame.Surface((Radius*2, Radius*2), pygame.SRCALPHA)
-bRook = piece.bRook()
-bKnight = piece.bKnight()
-bBishop = piece.bBishop()
-bQueen = piece.bQueen()
-bKing = piece.bKing()
-bPawn = piece.bPawn()
-empty = piece.empty()
-wRook = piece.wRook()
-wKnight = piece.wKnight()
-wBishop= piece.wBishop()
-wQueen = piece.wQueen()
-wKing = piece.wKing()
-wPawn = piece.wPawn()
+bRook = Piece.bRook()
+bKnight = Piece.bKnight()
+bBishop = Piece.bBishop()
+bQueen = Piece.bQueen()
+bKing = Piece.bKing()
+bPawn = Piece.bPawn()
+empty = Piece.empty()
+wRook = Piece.wRook()
+wKnight = Piece.wKnight()
+wBishop= Piece.wBishop()
+wQueen = Piece.wQueen()
+wKing = Piece.wKing()
+wPawn = Piece.wPawn()
         
 board = board.board(surface)   
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
@@ -50,10 +49,14 @@ for i in range(8):
 board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
 ##game
 piece = empty
-board.create(hasPieceSelected,[])
+board.create(hasPieceSelected,[],check)
 
 
-def run():
+def main():
+    hasPieceSelected= False
+    playerTurn = True
+    check = False
+    playerColor = white
     while True:
         pygame.display.update()
         for event in pygame.event.get():
@@ -68,14 +71,24 @@ def run():
             #converting from the x and y coords, into the square that is located there
             #this allows accsess to the underlying array
             if playerTurn == False:
-                engine.move(board.layout)
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                spot = board.layout[x + y*8]
-                if spot != empty and spot.color != black:
+                Engine.move(board.layout)
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                piece = board.layout[x + y*8]
+                if piece.name() != "Empty" and piece.color == playerColor:
                     hasPieceSelected = True
                     #yellow square designates the square the person has selected; and will
                     #stay yellow untill they pick another square or complete a move
-                    board.create(hasPieceSelected,[x,y])
+                    board.create(hasPieceSelected,[x,y],check)
+                    selectedPiece = board.layout[x+y*8]
+                    selectedPieceLocation = [x,y]
+                elif hasPieceSelected and [x,y] in selectedPiece.validMoves(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
+                    playerTurn = False
+                    hasPieceSelected = False
+                    board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
+                    selectedPieceLocation=[]
+                    board.layout[x + y*8] = selectedPiece
+                    board.create(hasPieceSelected, selectedPieceLocation, check)
+
 
                 
         #pygame.draw.circle(DISPLAYSURF,BLACK,(0,0),500)
@@ -89,4 +102,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    main()
