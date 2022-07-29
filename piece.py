@@ -457,7 +457,30 @@ def enemyMoveCheker(self,layout):
             moves = piece.potentialKillSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
             for move in moves:
                 enemyMoves.add(move[0] + move[1]*8)
-        elif piece.color != self.color and piece.name() != "King":
+        elif piece.color != self.color and piece.name() == "King":
+            moves = []
+            square = numToSquare(i)
+            x = square[0]
+            y = square[1]
+            if x < 7:
+                if y < 7:
+                    moves.append([x+1,y+1])
+                if y > 0:
+                    moves.append([x+1,y-1])
+                moves.append([x+1,y])
+            if x > 0:
+                if y < 7:
+                    moves.append([x-1,y+1])
+                if y > 0:
+                    moves.append([x-1,y-1])
+                moves.append([x-1,y])
+            if y < 7:
+                moves.append([x,y+1]) 
+            if y > 0:
+                moves.append([x,y-1])
+            for move in moves:
+                enemyMoves.add(move[0]+move[1]*8)
+        elif piece.color != self.color:
             square = numToSquare(i)
             tempMove = piece.validMoves(square[0],square[1],layout,surface)
             if tempMove:

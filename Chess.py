@@ -42,10 +42,7 @@ board = board.board(surface)
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
     board.layout.append(bPawn)
-for i in range(18):
-    board.layout.append(empty)
-board.layout.append(wKing)
-for i in range(15):
+for i in range(32):
     board.layout.append(empty)
 
 for i in range(8):
