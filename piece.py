@@ -33,7 +33,6 @@ class king(piece):
         enemyMoves = enemyMoveCheker(self, layout)
         enemies = []
         moves = []
-        i = 0
         #check each square indidually aginst the hashset containing possible enemy moves
         #may be worth optimizing by creating new method the test specifacally towards the king and add
         #those moves, pruning at each step; will add later
@@ -46,6 +45,14 @@ class king(piece):
                         enemies.append([x+1,y+1])
                 else:
                     moves.append([x+1,y+1])
+            if y > 0:
+                if (x+1+(y-1)*8) in enemyMoves:
+                    pass
+                elif layout[(x+1)+(y-1)*7].name() != "Empty":
+                    if layout[(x+1),(y-1)].color != this.color:
+                        enemies.append([x+1,y-1])
+                else:
+                    moves.append([x+1,y-1])
         while None in enemies:
             enemies.remove(None)
         return moves + enemies
@@ -100,6 +107,15 @@ class bPawn(pawn):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load("blackPawn.png"),(75,75))
         self.color = black
+    def killSpots(self,x,y,layout,surface):
+        moves = []
+        if y < 7:
+            if x < 7:
+                moves.append([x+1,y+1])
+            if x > 0:
+                moves.append([x-1,y+1])
+        return moves
+
 #bPawn = bPawn()
 
 
@@ -348,14 +364,18 @@ def circlePlacer(self,array,color,layout,surface):
 
 def enemyMoveCheker(self,layout):
     enemyMoves = set()
+    i =0
     for piece in layout:
-            if piece.color != self.color and piece.name == "Pawn":
-                enemyMoves.add(piece.killSpots())
-            elif piece.color != self.color and piece.name() != "King":
-                square = numToSquare(i)
-                tempMove = piece.validMoves(square[0],square[1],layout,surface)
+        if piece.color != self.color and piece.name == "Pawn":
+            moves = piece.killSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
+            for move in moves:
+                enemyMoves.add(move[0] + move[1]*8)
+        elif piece.color != self.color and piece.name() != "King":
+            square = numToSquare(i)
+            tempMove = piece.validMoves(square[0],square[1],layout,surface)
+            if tempMove:
                 for move in tempMove:
                     enemyMoves.add(move[0]+move[1]*8)
-            i+=1
+        i+=1
     return enemyMoves
 
