@@ -358,3 +358,4 @@ def enemyMoveCheker(self,layout):
                     enemyMoves.add(move[0]+move[1]*8)
             i+=1
     return enemyMoves
+
