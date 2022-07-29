@@ -30,19 +30,10 @@ class king(piece):
     def name(self):
         return "King"
     def validMoves(self,x,y,layout,surface):
-        enemyMoves = set()
+        enemyMoves = enemyMoveCheker(self, layout)
         enemies = []
         moves = []
         i = 0
-        for piece in layout:
-            if piece.color != self.color and piece.name == "Pawn":
-                pass
-            elif piece.color != self.color and piece.name() != "King":
-                square = numToSquare(i)
-                tempMove = piece.validMoves(square[0],square[1],layout,surface)
-                for move in tempMove:
-                    enemyMoves.add(move[0]+move[1]*8)
-            i+=1
         #check each square indidually aginst the hashset containing possible enemy moves
         #may be worth optimizing by creating new method the test specifacally towards the king and add
         #those moves, pruning at each step; will add later
@@ -354,3 +345,16 @@ def circlePlacer(self,array,color,layout,surface):
             drawCircle(move[0],move[1])
         elif layout[move[0]+move[1]*8].color != color:
             hollowCircle(move[0],move[1])
+
+def enemyMoveCheker(self,layout):
+    enemyMoves = set()
+    for piece in layout:
+            if piece.color != self.color and piece.name == "Pawn":
+                enemyMoves.add(piece.killSpots())
+            elif piece.color != self.color and piece.name() != "King":
+                square = numToSquare(i)
+                tempMove = piece.validMoves(square[0],square[1],layout,surface)
+                for move in tempMove:
+                    enemyMoves.add(move[0]+move[1]*8)
+            i+=1
+    return enemyMoves
