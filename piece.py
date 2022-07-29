@@ -53,6 +53,54 @@ class king(piece):
                         enemies.append([x+1,y-1])
                 else:
                     moves.append([x+1,y-1])
+            if (x+1+(y)*8) in enemyMoves:
+                pass
+            elif layout[(x+1)+(y)*7].name() != "Empty":
+                if layout[(x+1)+(y)*7].color != self.color:
+                    enemies.append([x+1,y])
+            else:
+                moves.append([x+1,y])
+        if x > 0:
+            if y < 7:
+                if (x-1+(y+1)*8) in enemyMoves:
+                    pass
+                elif layout[(x-1)+(y+1)*7].name() != "Empty":
+                    if layout[(x-1)+(y+1)*7].color != self.color:
+                        enemies.append([x-1,y+1])
+                else:
+                    moves.append([x-1,y+1])
+            if y > 0:
+                if (x-1+(y-1)*8) in enemyMoves:
+                    pass
+                elif layout[(x-1)+(y-1)*7].name() != "Empty":
+                    if layout[(x-1)+(y-1)*7].color != self.color:
+                        enemies.append([x-1,y-1])
+                else:
+                    moves.append([x-1,y-1])
+            if (x-1+(y)*8) in enemyMoves:
+                pass
+            elif layout[(x-1)+(y)*7].name() != "Empty":
+                if layout[(x-1)+(y)*7].color != self.color:
+                    enemies.append([x-1,y])
+            else:
+                moves.append([x-1,y])
+        if y < 7:
+            if (x+(y+1)*8) in enemyMoves:
+                pass
+            elif layout[(x)+(y+1)*7].name() != "Empty":
+                if layout[(x)+(y+1)*7].color != self.color:
+                    enemies.append([x,y+1])
+            else:
+                moves.append([x,y+1]) 
+        if y > 0:
+            if (x+(y-1)*8) in enemyMoves:
+                pass
+            elif layout[(x)+(y-1)*7].name() != "Empty":
+                if layout[(x)+(y-1)*7].color != self.color:
+                    enemies.append([x,y-1])
+            else:
+                moves.append([x,y-1])
+
         while None in enemies:
             enemies.remove(None)
         return moves + enemies
@@ -108,6 +156,14 @@ class wPawn(pawn):
                 if layout[x-1 + (y-1)*8].name() != "Empty" and (layout[x-1 + (y-1)*8].color != self.color):
                     moves.append([x-1,y-1])
         return moves
+    def potentialKillSpots(self,x,y,layout,surface):
+        moves =[]
+        if y > 0:
+            if x < 7:
+                moves.append([x+1,y-1])
+            if x > 0:
+                moves.append([x-1,y-1])
+        return moves
 
 
 #wPawn = wPawn()
@@ -121,22 +177,31 @@ class bPawn(pawn):
         if y < 7:
             if x < 7:
                 if layout[x+1 + (y+1)*8].name() != "Empty" and (layout[x+1 + (y+1)*8].color != self.color):
-                    moves.append([x+1,y-1])
+                    moves.append([x+1,y+1])
             if x > 0:
                 if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
-                    moves.append([x-1,y-1])
+                    moves.append([x-1,y+1])
+            circlePlacer(self, moves, black, layout, surface)
         return moves
-        def validMoves(self,x,y, layout,surface):
-            moves = []
-            if y == 1: 
-                if layout[x + 2*8].name() == "Empty":
-                    moves.append([x,5])
-                    if layout[x + 3*8].name() == "Empty":
-                        moves.append([x,4])
-            else: 
-                if layout[x + (y+1)*8].name() == "Empty":
-                    moves.append([x,y+1])
-            return moves + self.killSpots(x,y,layout,surface)
+    def validMoves(self,x,y, layout,surface):
+        moves = []
+        if y == 1: 
+            if layout[x + 2*8].name() == "Empty":
+                moves.append([x,5])
+                if layout[x + 3*8].name() == "Empty":
+                    moves.append([x,4])
+        else: 
+            if layout[x + (y+1)*8].name() == "Empty":
+                moves.append([x,y+1])
+        return moves + self.killSpots(x,y,layout,surface)
+    def potentialKillSpots(self,x,y,layout,surface):
+        moves = []
+        if y < 7:
+            if x < 7:
+                moves.append([x+1,y+1])
+            if x > 0:
+                moves.append([x-1,y+1])
+        return moves
 
 #bPawn = bPawn()
 
@@ -389,7 +454,7 @@ def enemyMoveCheker(self,layout):
     i =0
     for piece in layout:
         if piece.color != self.color and piece.name() == "Pawn":
-            moves = piece.killSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
+            moves = piece.potentialKillSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
             for move in moves:
                 enemyMoves.add(move[0] + move[1]*8)
         elif piece.color != self.color and piece.name() != "King":

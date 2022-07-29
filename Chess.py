@@ -42,12 +42,12 @@ board = board.board(surface)
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
     board.layout.append(bPawn)
-for i in range(10):
+for i in range(18):
+    board.layout.append(empty)
+board.layout.append(wKing)
+for i in range(15):
     board.layout.append(empty)
 
-for i in range(21):
-    board.layout.append(empty)
-board.layout.append(bKnight)
 for i in range(8):
     board.layout.append(wPawn)
 board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
@@ -56,38 +56,40 @@ piece = empty
 board.create(hasPieceSelected,[])
 
 
+def run():
+    while True:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            held = pygame.mouse.get_pressed()
+            mouse = pygame.mouse.get_pos()
+            trueX = mouse[0]
+            trueY = mouse[1]
+            x = round((trueX - 32.5) / 75) 
+            y = round((trueY - 32.5) / 75) 
+            #converting from the x and y coords, into the square that is located there
+            #this allows accsess to the underlying array
+            if playerTurn == False:
+                engine.move(board.layout)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                spot = board.layout[x + y*8]
+                if spot != empty and spot.color != black:
+                    hasPieceSelected = True
+                    #yellow square designates the square the person has selected; and will
+                    #stay yellow untill they pick another square or complete a move
+                    board.create(hasPieceSelected,[x,y])
 
-while True:
-    pygame.display.update()
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-        held = pygame.mouse.get_pressed()
-        mouse = pygame.mouse.get_pos()
-        trueX = mouse[0]
-        trueY = mouse[1]
-        x = round((trueX - 32.5) / 75) 
-        y = round((trueY - 32.5) / 75) 
-        #converting from the x and y coords, into the square that is located there
-        #this allows accsess to the underlying array
-        if playerTurn == False:
-            engine.move(board.layout)
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            spot = board.layout[x + y*8]
-            if spot != empty and spot.color != black:
-                hasPieceSelected = True
-                #yellow square designates the square the person has selected; and will
-                #stay yellow untill they pick another square or complete a move
-                board.create(hasPieceSelected,[x,y])
+                
+        #pygame.draw.circle(DISPLAYSURF,BLACK,(0,0),500)
+        x = 0
+        y = 0
+        
 
-            
-    #pygame.draw.circle(DISPLAYSURF,BLACK,(0,0),500)
-    x = 0
-    y = 0
-    
-
-    #end of frame
-    
-    FramePerSec.tick(FPS)
+        #end of frame
+        
+        FramePerSec.tick(FPS)
 
 
+if __name__ == "__main__":
+    run()
