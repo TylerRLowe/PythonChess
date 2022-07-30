@@ -71,7 +71,9 @@ def main():
             #converting from the x and y coords, into the square that is located there
             #this allows accsess to the underlying array
             if playerTurn == False:
-                Engine.move(board.layout)
+                board.layout = Engine.move(board.layout,playerColor)
+                board.create(hasPieceSelected,selectedPieceLocation,check)
+                playerTurn = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 piece = board.layout[x + y*8]
                 if piece.name() != "Empty" and piece.color == playerColor:

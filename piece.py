@@ -187,9 +187,9 @@ class bPawn(pawn):
         moves = []
         if y == 1: 
             if layout[x + 2*8].name() == "Empty":
-                moves.append([x,5])
+                moves.append([x,2])
                 if layout[x + 3*8].name() == "Empty":
-                    moves.append([x,4])
+                    moves.append([x,3])
         else: 
             if layout[x + (y+1)*8].name() == "Empty":
                 moves.append([x,y+1])
