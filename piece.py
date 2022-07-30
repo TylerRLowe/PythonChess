@@ -419,6 +419,34 @@ def knightMoves(self,x,y,layout,surface):
             enemies.append(enemyCheck(self,c,r,layout,surface))
         else:
             moves.append([c,r])
+    c = x+2
+    r = y+1
+    if c < 8 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-2
+    r = y+1
+    if c > -1 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x+2
+    r = y-1
+    if c < 8 and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-2
+    r = y-1
+    if c >-1  and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
     while None in enemies:
         enemies.remove(None)
     return moves + enemies
