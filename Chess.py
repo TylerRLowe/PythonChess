@@ -15,6 +15,8 @@ grey = pygame.Color(84,84,84,200)
 surface.fill(green)
 pygame.display.set_caption("Chess")
 FPS = 60
+pygame.font.init() 
+my_font = pygame.font.SysFont('Comic Sans MS', 30)
 Piece.surface = surface
 FramePerSec = pygame.time.Clock()
 hasPieceSelected= False
@@ -75,21 +77,27 @@ def main():
                 board.create(hasPieceSelected,selectedPieceLocation,check)
                 playerTurn = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                piece = board.layout[x + y*8]
-                if piece.name() != "Empty" and piece.color == playerColor:
-                    hasPieceSelected = True
-                    #yellow square designates the square the person has selected; and will
-                    #stay yellow untill they pick another square or complete a move
-                    board.create(hasPieceSelected,[x,y],check)
-                    selectedPiece = board.layout[x+y*8]
-                    selectedPieceLocation = [x,y]
-                elif hasPieceSelected and [x,y] in selectedPiece.validMoves(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
-                    playerTurn = False
-                    hasPieceSelected = False
-                    board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
-                    selectedPieceLocation=[]
-                    board.layout[x + y*8] = selectedPiece
-                    board.create(hasPieceSelected, selectedPieceLocation, check)
+                if y > 7 or y < 1 or x > 7 or x < 0:
+                    pass
+                else:
+                    piece = board.layout[x + y*8]
+                    if piece.name() != "Empty" and piece.color == playerColor:
+                        hasPieceSelected = True
+                        #yellow square designates the square the person has selected; and will
+                        #stay yellow untill they pick another square or complete a move
+                        board.create(hasPieceSelected,[x,y],check)
+                        selectedPiece = board.layout[x+y*8]
+                        selectedPieceLocation = [x,y]
+                    elif hasPieceSelected and [x,y] in selectedPiece.validMoves(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
+                        playerTurn = False
+                        hasPieceSelected = False
+                        board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
+                        selectedPieceLocation=[]
+                        if board.layout[x+y*8].name() == "King":
+                            pass
+                        board.layout[x + y*8] = selectedPiece
+                        board.create(hasPieceSelected, selectedPieceLocation, check)
+                    
 
 
                 
