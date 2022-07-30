@@ -3,6 +3,8 @@ import Piece
 import board
 import random
 surface = Piece.surface
+empty = Piece.empty()
+bQueen = Piece.bQueen()
 def move(layout,playerColor):
     pieces = []
     locs = []
@@ -12,8 +14,6 @@ def move(layout,playerColor):
     i = 0
     for piece in layout:
         square = Piece.numToSquare(i)
-        if piece.name() == "Empty":
-            empty = piece
         if piece.color != playerColor and piece.validMoves(square[0],square[1],layout,surface):
             pieces.append(piece)
             locs.append(i)
@@ -22,6 +22,9 @@ def move(layout,playerColor):
     square = Piece.numToSquare(locs[mover])
     moves = pieces[mover].validMoves(square[0],square[1],layout,surface)
     move = moves[random.randint(0, len(moves)-1)]
-    layout[move[0]+move[1]*8] = pieces[mover]
+    if pieces[mover].name() == "Pawn" and move[0] + move[1]*8 >= 56:
+        layout[move[0]+move[1]*8] = bQueen
+    else:
+        layout[move[0]+move[1]*8] = pieces[mover]
     layout[square[0] + square[1]*8] = empty
     return(layout)

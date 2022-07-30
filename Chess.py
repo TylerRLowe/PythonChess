@@ -37,8 +37,7 @@ wKnight = Piece.wKnight()
 wBishop= Piece.wBishop()
 wQueen = Piece.wQueen()
 wKing = Piece.wKing()
-wPawn = Piece.wPawn()
-        
+wPawn = Piece.wPawn()      
 board = board.board(surface)   
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
@@ -53,13 +52,13 @@ board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
 piece = empty
 board.create(hasPieceSelected,[],check)
 
-
+playing = True
 def main():
     hasPieceSelected= False
     playerTurn = True
     check = False
     playerColor = white
-    while True:
+    while playing:
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -77,7 +76,7 @@ def main():
                 board.create(hasPieceSelected,selectedPieceLocation,check)
                 playerTurn = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if y > 7 or y < 1 or x > 7 or x < 0:
+                if y > 7 or y < 0 or x > 7 or x < 0:
                     pass
                 else:
                     piece = board.layout[x + y*8]
@@ -93,9 +92,12 @@ def main():
                         hasPieceSelected = False
                         board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
                         selectedPieceLocation=[]
-                        if board.layout[x+y*8].name() == "King":
-                            pass
+                        #auto queens on a pawn getting to the other side
+                        if selectedPiece.name() == "Pawn" and x + y*8 <= 7:
+                            selectedPiece = wQueen
                         board.layout[x + y*8] = selectedPiece
+                        if board.layout[x+y*8].validMoves(x,y,board.layout,surface):
+                            pass
                         board.create(hasPieceSelected, selectedPieceLocation, check)
                     
 
