@@ -475,7 +475,8 @@ def circlePlacer(self,array,color,layout,surface):
             drawCircle(move[0],move[1])
         elif layout[move[0]+move[1]*8].color != color:
             hollowCircle(move[0],move[1])
-
+#takes the piece for color, but sends piece for future proofing since i antipate having a seperate check for king at some point
+#
 def enemyMoveCheker(self,layout):
     enemyMoves = set()
     i =0
@@ -526,6 +527,16 @@ def safe(piece,move,orgin,layoutCopy,surface):
             return False
         return True
     if bKingSquare in enemyMoveCheker(piece, layout):
+        return False
+    return True
+def safeForKingMove(piece,move,orgin,layoutCopy,surface):
+    layout =  copy.copy(layoutCopy)
+    #creating a tempory layout to check if the king is safe from check after this move
+    if piece.color == white:
+        if (move[0]+move[1]*8) in enemyMoveCheker(piece, layout):
+            return False
+        return True
+    if (move[0]+move[1]*8) in enemyMoveCheker(piece, layout):
         return False
     return True
 def bKingMove(num):

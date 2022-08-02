@@ -99,6 +99,8 @@ def main():
                             Piece.wKingMove(x+y*8)
                         if Piece.bKingSquare in board.layout[x+y*8].validMoves(x,y,board.layout,surface):
                             piece.bKingCheck = True
+                        if selectedPiece.name() == "King":
+                            Piece.wKingSquare = x + y*8
                         board.create(hasPieceSelected, selectedPieceLocation)
                     
 

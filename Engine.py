@@ -29,6 +29,6 @@ def move(layout,playerColor,wKing,bKing):
     if pieces[mover].name() == "King":
         Piece.bKingMove(move[0]+move[1]*8)
     if Piece.numToSquare(Piece.bKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,surface):
-        piece.bKingCheck= TrueS
+        piece.bKingCheck= True
     layout[square[0] + square[1]*8] = empty
     return(layout)
