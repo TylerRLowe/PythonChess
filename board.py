@@ -13,7 +13,7 @@ class board:
         self.surface = surface
     def layout(self):
         pass
-    def create(self,hasPieceSelected,pieceSelectedLocation,check):
+    def create(self,hasPieceSelected,pieceSelectedLocation):
         x = 0
         y = 0
         #wiping the screen (removes previous pieces)

@@ -5,7 +5,14 @@ cream = pygame.Color(235,230,208)
 green = pygame.Color(0,80,0)
 grey = pygame.Color(84,84,84,200)
 from pygame.locals import *
+import copy
 Radius = 75/2
+bKingSquare = 4
+wKingSquare = 60
+wCastle = True
+bCastle = True
+bKingCheck = False
+wKingCheck = False
 circle = pygame.Surface((Radius*2, Radius*2), pygame.SRCALPHA)
 surface = None
 class piece():
@@ -30,7 +37,6 @@ class king(piece):
     def name(self):
         return "King"
     def validMoves(self,x,y,layout,surface):
-        enemyMoves = enemyMoveCheker(self, layout)
         enemies = []
         moves = []
         #check each square indidually aginst the hashset containing possible enemy moves
@@ -38,84 +44,77 @@ class king(piece):
         #those moves, pruning at each step; will add later
         if x < 7:
             if y < 7:
-                if (x+1+(y+1)*8) in enemyMoves:
-                    pass
-                elif layout[(x+1)+(y+1)*7].name() != "Empty":
-                    if layout[(x+1)+(y+1)*7].color != self.color:
+                if layout[(x+1)+(y+1)*8].name() != "Empty":
+                    if layout[(x+1)+(y+1)*8].color != self.color:
                         enemies.append([x+1,y+1])
                 else:
                     moves.append([x+1,y+1])
             if y > 0:
-                if (x+1+(y-1)*8) in enemyMoves:
-                    pass
-                elif layout[(x+1)+(y-1)*7].name() != "Empty":
-                    if layout[(x+1)+(y-1)*7].color != self.color:
+                if layout[(x+1)+(y-1)*8].name() != "Empty":
+                    if layout[(x+1)+(y-1)*8].color != self.color:
                         enemies.append([x+1,y-1])
                 else:
                     moves.append([x+1,y-1])
-            if (x+1+(y)*8) in enemyMoves:
-                pass
-            elif layout[(x+1)+(y)*7].name() != "Empty":
-                if layout[(x+1)+(y)*7].color != self.color:
+            if layout[(x+1)+(y)*8].name() != "Empty":
+                if layout[(x+1)+(y)*8].color != self.color:
                     enemies.append([x+1,y])
             else:
                 moves.append([x+1,y])
         if x > 0:
             if y < 7:
-                if (x-1+(y+1)*8) in enemyMoves:
-                    pass
-                elif layout[(x-1)+(y+1)*7].name() != "Empty":
-                    if layout[(x-1)+(y+1)*7].color != self.color:
+                if layout[(x-1)+(y+1)*8].name() != "Empty":
+                    if layout[(x-1)+(y+1)*8].color != self.color:
                         enemies.append([x-1,y+1])
                 else:
                     moves.append([x-1,y+1])
             if y > 0:
-                if (x-1+(y-1)*8) in enemyMoves:
-                    pass
-                elif layout[(x-1)+(y-1)*7].name() != "Empty":
-                    if layout[(x-1)+(y-1)*7].color != self.color:
+                if layout[(x-1)+(y-1)*8].name() != "Empty":
+                    if layout[(x-1)+(y-1)*8].color != self.color:
                         enemies.append([x-1,y-1])
                 else:
                     moves.append([x-1,y-1])
-            if (x-1+(y)*8) in enemyMoves:
-                pass
-            elif layout[(x-1)+(y)*7].name() != "Empty":
-                if layout[(x-1)+(y)*7].color != self.color:
+            if layout[(x-1)+(y)*8].name() != "Empty":
+                if layout[(x-1)+(y)*8].color != self.color:
                     enemies.append([x-1,y])
             else:
                 moves.append([x-1,y])
         if y < 7:
-            if (x+(y+1)*8) in enemyMoves:
-                pass
-            elif layout[(x)+(y+1)*7].name() != "Empty":
-                if layout[(x)+(y+1)*7].color != self.color:
+            if layout[(x)+(y+1)*8].name() != "Empty":
+                if layout[(x)+(y+1)*8].color != self.color:
                     enemies.append([x,y+1])
             else:
                 moves.append([x,y+1]) 
         if y > 0:
-            if (x+(y-1)*8) in enemyMoves:
-                pass
-            elif layout[(x)+(y-1)*7].name() != "Empty":
-                if layout[(x)+(y-1)*7].color != self.color:
+            if layout[(x)+(y-1)*8].name() != "Empty":
+                if layout[(x)+(y-1)*8].color != self.color:
                     enemies.append([x,y-1])
             else:
                 moves.append([x,y-1])
 
         while None in enemies:
             enemies.remove(None)
-        return moves + enemies
+        moves += enemies
+
+        for move in moves:
+            if safe(self,move,[x,y],layout,surface) == False:
+                moves.remove(move)
+        return moves
 
 class wKing(king):
     def __init__(self):
         super().__init__()
         self.image = pygame.transform.scale(pygame.image.load("whiteKing.png"),(75,75))
         self.color = white
+        self.canCastle = True
+        self.check = False
 #wKing = wKing()
 class bKing(king):
     def __init__(self):
         super().__init__()
         self.color = black
         self.image = pygame.transform.scale(pygame.image.load("blackKing.png"),(75,75))
+        self.canCastle = True
+        self.check = False
 #bKing = bKing()
 
 
@@ -305,7 +304,7 @@ class bKnight(knight):
 
 #empty
 
-class empty(piece):
+class emptyPiece(piece):
     def __init__(self):
         super().__init__()
         self.value = 0
@@ -516,4 +515,24 @@ def enemyMoveCheker(self,layout):
                     enemyMoves.add(move[0]+move[1]*8)
         i+=1
     return enemyMoves
+
+def safe(piece,move,orgin,layoutCopy,surface):
+    layout =  copy.copy(layoutCopy)
+    #creating a tempory layout to check if the king is safe from check after this move
+    layout[orgin[0] + orgin[1]*8] = emptyPiece()
+    layout[move[0] + move[1]*8] = piece
+    if piece.color == white:
+        if wKingSquare in enemyMoveCheker(piece, layout):
+            return False
+        return True
+    if bKingSquare in enemyMoveCheker(piece, layout):
+        return False
+    return True
+def bKingMove(num):
+    bCastle = False
+    bKingSquare = num
+def wKingMove(num):
+    wCastle = False
+    wKingSquare = num
+
 

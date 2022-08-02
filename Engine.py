@@ -3,9 +3,9 @@ import Piece
 import board
 import random
 surface = Piece.surface
-empty = Piece.empty()
+empty = Piece.emptyPiece()
 bQueen = Piece.bQueen()
-def move(layout,playerColor):
+def move(layout,playerColor,wKing,bKing):
     pieces = []
     locs = []
     #keeps track of black pieces and their locations in the array
@@ -26,5 +26,9 @@ def move(layout,playerColor):
         layout[move[0]+move[1]*8] = bQueen
     else:
         layout[move[0]+move[1]*8] = pieces[mover]
+    if pieces[mover].name() == "King":
+        Piece.bKingMove(move[0]+move[1]*8)
+    if Piece.numToSquare(Piece.bKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,surface):
+        piece.bKingCheck= TrueS
     layout[square[0] + square[1]*8] = empty
     return(layout)

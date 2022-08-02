@@ -31,14 +31,14 @@ bBishop = Piece.bBishop()
 bQueen = Piece.bQueen()
 bKing = Piece.bKing()
 bPawn = Piece.bPawn()
-empty = Piece.empty()
+empty = Piece.emptyPiece()
 wRook = Piece.wRook()
 wKnight = Piece.wKnight()
 wBishop= Piece.wBishop()
 wQueen = Piece.wQueen()
 wKing = Piece.wKing()
 wPawn = Piece.wPawn()      
-board = board.board(surface)   
+board = board.board(surface)  
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
     board.layout.append(bPawn)
@@ -50,13 +50,12 @@ for i in range(8):
 board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
 ##game
 piece = empty
-board.create(hasPieceSelected,[],check)
+board.create(hasPieceSelected,[])
 
 playing = True
 def main():
     hasPieceSelected= False
     playerTurn = True
-    check = False
     playerColor = white
     while playing:
         pygame.display.update()
@@ -72,8 +71,8 @@ def main():
             #converting from the x and y coords, into the square that is located there
             #this allows accsess to the underlying array
             if playerTurn == False:
-                board.layout = Engine.move(board.layout,playerColor)
-                board.create(hasPieceSelected,selectedPieceLocation,check)
+                board.layout = Engine.move(board.layout,playerColor,wKing,bKing)
+                board.create(hasPieceSelected,selectedPieceLocation)
                 playerTurn = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if y > 7 or y < 0 or x > 7 or x < 0:
@@ -84,7 +83,7 @@ def main():
                         hasPieceSelected = True
                         #yellow square designates the square the person has selected; and will
                         #stay yellow untill they pick another square or complete a move
-                        board.create(hasPieceSelected,[x,y],check)
+                        board.create(hasPieceSelected,[x,y])
                         selectedPiece = board.layout[x+y*8]
                         selectedPieceLocation = [x,y]
                     elif hasPieceSelected and [x,y] in selectedPiece.validMoves(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
@@ -96,9 +95,11 @@ def main():
                         if selectedPiece.name() == "Pawn" and x + y*8 <= 7:
                             selectedPiece = wQueen
                         board.layout[x + y*8] = selectedPiece
-                        if board.layout[x+y*8].validMoves(x,y,board.layout,surface):
-                            pass
-                        board.create(hasPieceSelected, selectedPieceLocation, check)
+                        if selectedPiece.name() == "King":
+                            Piece.wKingMove(x+y*8)
+                        if Piece.bKingSquare in board.layout[x+y*8].validMoves(x,y,board.layout,surface):
+                            piece.bKingCheck = True
+                        board.create(hasPieceSelected, selectedPieceLocation)
                     
 
 
