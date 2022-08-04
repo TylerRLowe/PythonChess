@@ -44,60 +44,66 @@ class king(piece):
         #those moves, pruning at each step; will add later
         if x < 7:
             if y < 7:
-                if layout[(x+1)+(y+1)*8].name() != "Empty":
-                    if layout[(x+1)+(y+1)*8].color != self.color:
-                        enemies.append([x+1,y+1])
-                else:
-                    moves.append([x+1,y+1])
+                if safeForKingMove(self,[x+1,y+1],[x,y],layout,surface):
+                    if layout[(x+1)+(y+1)*8].name() != "Empty":
+                        if layout[(x+1)+(y+1)*8].color != self.color:
+                            enemies.append([x+1,y+1])
+                    else:
+                        moves.append([x+1,y+1])
             if y > 0:
-                if layout[(x+1)+(y-1)*8].name() != "Empty":
-                    if layout[(x+1)+(y-1)*8].color != self.color:
-                        enemies.append([x+1,y-1])
+                if safeForKingMove(self,[x+1,y-1],[x,y],layout,surface):
+                    if layout[(x+1)+(y-1)*8].name() != "Empty":
+                        if layout[(x+1)+(y-1)*8].color != self.color:
+                            enemies.append([x+1,y-1])
+                    else:
+                        moves.append([x+1,y-1])
+            if safeForKingMove(self,[x+1,y],[x,y],layout,surface):
+                if layout[(x+1)+(y)*8].name() != "Empty":
+                    if layout[(x+1)+(y)*8].color != self.color:
+                        enemies.append([x+1,y])
                 else:
-                    moves.append([x+1,y-1])
-            if layout[(x+1)+(y)*8].name() != "Empty":
-                if layout[(x+1)+(y)*8].color != self.color:
-                    enemies.append([x+1,y])
-            else:
-                moves.append([x+1,y])
+                    moves.append([x+1,y])
         if x > 0:
             if y < 7:
-                if layout[(x-1)+(y+1)*8].name() != "Empty":
-                    if layout[(x-1)+(y+1)*8].color != self.color:
-                        enemies.append([x-1,y+1])
-                else:
-                    moves.append([x-1,y+1])
+                if safeForKingMove(self,[x-1,y+1],[x,y],layout,surface):
+                    if layout[(x-1)+(y+1)*8].name() != "Empty":
+                        if layout[(x-1)+(y+1)*8].color != self.color:
+                            enemies.append([x-1,y+1])
+                    else:
+                        moves.append([x-1,y+1])
             if y > 0:
-                if layout[(x-1)+(y-1)*8].name() != "Empty":
-                    if layout[(x-1)+(y-1)*8].color != self.color:
-                        enemies.append([x-1,y-1])
+                if safeForKingMove(self,[x-1,y-1],[x,y],layout,surface):
+                    if layout[(x-1)+(y-1)*8].name() != "Empty":
+                        if layout[(x-1)+(y-1)*8].color != self.color:
+                            enemies.append([x-1,y-1])
+                    else:
+                        moves.append([x-1,y-1])
+            if safeForKingMove(self,[x-1,y],[x,y],layout,surface):
+                if layout[(x-1)+(y)*8].name() != "Empty":
+                    if layout[(x-1)+(y)*8].color != self.color:
+                        enemies.append([x-1,y])
                 else:
-                    moves.append([x-1,y-1])
-            if layout[(x-1)+(y)*8].name() != "Empty":
-                if layout[(x-1)+(y)*8].color != self.color:
-                    enemies.append([x-1,y])
-            else:
-                moves.append([x-1,y])
-        if y < 7:
-            if layout[(x)+(y+1)*8].name() != "Empty":
-                if layout[(x)+(y+1)*8].color != self.color:
-                    enemies.append([x,y+1])
-            else:
-                moves.append([x,y+1]) 
-        if y > 0:
-            if layout[(x)+(y-1)*8].name() != "Empty":
-                if layout[(x)+(y-1)*8].color != self.color:
-                    enemies.append([x,y-1])
-            else:
-                moves.append([x,y-1])
+                    moves.append([x-1,y])
+        if safeForKingMove(self,[x,y+1],[x,y],layout,surface):
+            if y < 7:
+                if layout[(x)+(y+1)*8].name() != "Empty":
+                    if layout[(x)+(y+1)*8].color != self.color:
+                        enemies.append([x,y+1])
+                else:
+                    moves.append([x,y+1]) 
+        if safeForKingMove(self,[x,y-1],[x,y],layout,surface):
+            if y > 0:
+                if layout[(x)+(y-1)*8].name() != "Empty":
+                    if layout[(x)+(y-1)*8].color != self.color:
+                        enemies.append([x,y-1])
+                else:
+                    moves.append([x,y-1])
 
-        while None in enemies:
-            enemies.remove(None)
+        #while None in enemies:
+         #   enemies.remove(None)
         moves += enemies
-
-        for move in moves:
-            if safe(self,move,[x,y],layout,surface) == False:
-                moves.remove(move)
+        count = len(moves) -1
+        i = 0
         return moves
 
 class wKing(king):
@@ -180,7 +186,6 @@ class bPawn(pawn):
             if x > 0:
                 if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
                     moves.append([x-1,y+1])
-            circlePlacer(self, moves, black, layout, surface)
         return moves
     def validMoves(self,x,y, layout,surface):
         moves = []
@@ -469,7 +474,9 @@ def numToSquare(num):
     return[num%8, int(num /8)] 
 
 #could optimize slightly by pruning enemy squares, not worth it for just drawing 
-def circlePlacer(self,array,color,layout,surface):
+def circlePlacer(array,color,layout,surface):
+    if(array == None or len(array)==0):
+        return
     for move in array:
         if layout[move[0]+move[1]*8].name() == "Empty":
             drawCircle(move[0],move[1])
@@ -522,21 +529,25 @@ def safe(piece,move,orgin,layoutCopy,surface):
     #creating a tempory layout to check if the king is safe from check after this move
     layout[orgin[0] + orgin[1]*8] = emptyPiece()
     layout[move[0] + move[1]*8] = piece
+    enemies = enemyMoveCheker(piece, layout)
     if piece.color == white:
-        if wKingSquare in enemyMoveCheker(piece, layout):
+        if wKingSquare in enemies:
             return False
         return True
-    if bKingSquare in enemyMoveCheker(piece, layout):
+    if bKingSquare in enemies:
         return False
     return True
 def safeForKingMove(piece,move,orgin,layoutCopy,surface):
     layout =  copy.copy(layoutCopy)
+    enemies = enemyMoveCheker(piece, layout)
+    #print(enemies,wKingSquare,move)
     #creating a tempory layout to check if the king is safe from check after this move
     if piece.color == white:
-        if (move[0]+move[1]*8) in enemyMoveCheker(piece, layout):
+        if (move[0]+move[1]*8) in enemies:
             return False
+        #print(True)
         return True
-    if (move[0]+move[1]*8) in enemyMoveCheker(piece, layout):
+    if (move[0]+move[1]*8) in enemies:
         return False
     return True
 def bKingMove(num):
