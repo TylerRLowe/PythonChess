@@ -84,15 +84,15 @@ class king(piece):
                         enemies.append([x-1,y])
                 else:
                     moves.append([x-1,y])
-        if safeForKingMove(self,[x,y+1],[x,y],layout,surface):
-            if y < 7:
+        if y < 7:
+            if safeForKingMove(self,[x,y+1],[x,y],layout,surface):
                 if layout[(x)+(y+1)*8].name() != "Empty":
                     if layout[(x)+(y+1)*8].color != self.color:
                         enemies.append([x,y+1])
                 else:
                     moves.append([x,y+1]) 
-        if safeForKingMove(self,[x,y-1],[x,y],layout,surface):
-            if y > 0:
+        if y > 0:
+            if safeForKingMove(self,[x,y-1],[x,y],layout,surface):
                 if layout[(x)+(y-1)*8].name() != "Empty":
                     if layout[(x)+(y-1)*8].color != self.color:
                         enemies.append([x,y-1])
@@ -484,7 +484,11 @@ def circlePlacer(array,color,layout,surface):
             hollowCircle(move[0],move[1])
 #takes the piece for color, but sends piece for future proofing since i antipate having a seperate check for king at some point
 #
-def enemyMoveCheker(self,layout):
+def enemyMoveCheker(self,layout,move,orgin):
+    if move != None:
+        layout = copy.copy(layout)
+        layout[move[0] + move[1]*8] = layout[orgin[0] + orgin[1]*8]
+        layout[orgin[0] + orgin[1]*8] = emptyPiece()
     enemyMoves = set()
     i =0
     for piece in layout:
@@ -529,7 +533,7 @@ def safe(piece,move,orgin,layoutCopy,surface):
     #creating a tempory layout to check if the king is safe from check after this move
     layout[orgin[0] + orgin[1]*8] = emptyPiece()
     layout[move[0] + move[1]*8] = piece
-    enemies = enemyMoveCheker(piece, layout)
+    enemies = enemyMoveCheker(piece, layout,move,orgin)
     if piece.color == white:
         if wKingSquare in enemies:
             return False
@@ -539,7 +543,7 @@ def safe(piece,move,orgin,layoutCopy,surface):
     return True
 def safeForKingMove(piece,move,orgin,layoutCopy,surface):
     layout =  copy.copy(layoutCopy)
-    enemies = enemyMoveCheker(piece, layout)
+    enemies = enemyMoveCheker(piece, layout,move,orgin)
     #print(enemies,wKingSquare,move)
     #creating a tempory layout to check if the king is safe from check after this move
     if piece.color == white:
