@@ -180,7 +180,26 @@ class wPawn(pawn):
             if x > 0:
                 moves.append([x-1,y-1])
         return moves
-
+    def thisPieceCanMove(self,x,y,layout,surface):
+        enemies = enemyMoveCheker(self,layout,None,None)
+        moves = []
+        #first chech if pawn has not yet moved by checking if in 7th row
+        if y == 6:
+            if layout[x + 5*8].name() == "Empty":
+                if safe(self,[x,5],[x,y],layout,surface,enemies):moves.append([x,5])
+                if layout[x + 4*8].name() == "Empty":
+                    if safe(self,[x,4],[x,y],layout,surface,enemies):moves.append([x,4])
+        else: 
+            if layout[x + (y-1)*8].name() == "Empty":
+                if safe(self,[x,y-1],[x,y],layout,surface,enemies):moves.append([x,y-1])
+        if y > 0:
+            if x < 7:
+                if layout[x+1 + (y-1)*8].name() != "Empty" and (layout[x+1 + (y-1)*8].color != self.color):
+                    if safe(self,[x+1,y-1],[x,y],layout,surface,enemies):moves.append([x+1,y-1])
+            if x > 0:
+                if layout[x-1 + (y-1)*8].name() != "Empty" and (layout[x-1 + (y-1)*8].color != self.color):
+                    if safe(self,[x+1,y-1],[x,y],layout,surface,enemies):moves.append([x-1,y-1])
+        return moves
 
 #wPawn = wPawn()
 class bPawn(pawn):
@@ -217,6 +236,24 @@ class bPawn(pawn):
             if x > 0:
                 moves.append([x-1,y+1])
         return moves
+    def thisPieceCanMove(self,x,y,layout,surface):
+        moves = []
+        enemies = enemyMoveCheker(self,layout,None,None)
+        if y == 1: 
+            if layout[x + 2*8].name() == "Empty":
+                if safe(self,[x,2],[x,y],layout,surface,enemies): moves.append([x,2])
+                if layout[x + 3*8].name() == "Empty":
+                    if safe(self,[x,3],[x,y],layout,surface,enemies): moves.append([x,3])
+        else: 
+            if layout[x + (y+1)*8].name() == "Empty":
+                if safe(self,[x,y+1],[x,y],layout,surface,enemies): moves.append([x,y+1])
+        if y < 7:
+            if x < 7:
+                if safe(self,[x+1,y+1],[x,y],layout,surface,enemies): moves.append([x+1,y+1])
+            if x > 0:
+                if safe(self,[x-1,y+1],[x,y],layout,surface,enemies): moves.append([x-1,y+1])
+        return moves
+        
 
 #bPawn = bPawn()
 
@@ -231,6 +268,8 @@ class rook(piece):
         return "Rook"
     def validMoves(self,x,y,layout,surface):
         return rookMoveChecks(self,x,y,layout,surface)
+    def thisPieceCanMove(self,x,y,layout,surface):
+        return rookMoveChecksMainPiece(self, x, y, layout, surface)
 
 class wRook(rook):
     def __init__(self):
@@ -256,6 +295,8 @@ class queen(piece):
         return "Queen"
     def validMoves(self,x,y,layout,surface):
         return diagonalChecks(self,x,y,layout,surface) + rookMoveChecks(self,x,y,layout,surface)
+    def thisPieceCanMove(self,x,y,layout,surface):
+        return diagonalChecksMainPiece(self, x, y, layout, surface) + rookMoveChecksMainPiece(self,x,y,layout,surface)
 
 class wQueen(queen):
     def __init__(self):
@@ -306,6 +347,8 @@ class knight(piece):
         return "Knight"
     def validMoves(self,x,y,layout,sruface):
         return knightMoves(self,x,y,layout,surface)
+    def thisPieceCanMove(self,x,y,layout,surface):
+        return knightMovesMainPiece(self, x, y, layout, surface)
 
 class wKnight(knight):
     def __init__(self):
@@ -447,6 +490,162 @@ def rookMoveChecks(self,x,y,layout,surface):
             enemies.append(enemyCheck(self,x,r,layout,surface))
             break
         moves.append([x,r])
+    r = y
+    while None in enemies:
+        enemies.remove(None)
+    return moves + enemies
+
+def knightMoves(self,x,y,layout,surface):
+    moves =[]
+    enemies = []
+    c = x+1
+    r = y+2
+    if c < 8 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-1
+    r = y+2
+    if c > -1 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x+1
+    r = y-2
+    if c < 8 and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-1
+    r = y-2
+    if c >-1  and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x+2
+    r = y+1
+    if c < 8 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-2
+    r = y+1
+    if c > -1 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x+2
+    r = y-1
+    if c < 8 and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    c = x-2
+    r = y-1
+    if c >-1  and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            moves.append([c,r])
+    while None in enemies:
+        enemies.remove(None)
+    return moves + enemies
+
+def knightMovesMainPiece(self,x,y,layout,surface):
+    moves =[]
+    enemies = []
+    enemyMoves = enemyMoveCheker(self,layout,None,None)
+    c = x+1
+    r = y+2
+    if c < 8 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x-1
+    r = y+2
+    if c > -1 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x+1
+    r = y-2
+    if c < 8 and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x-1
+    r = y-2
+    if c >-1  and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x+2
+    r = y+1
+    if c < 8 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x-2
+    r = y+1
+    if c > -1 and r < 8:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x+2
+    r = y-1
+    if c < 8 and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    c = x-2
+    r = y-1
+    if c >-1  and r > -1:
+        if layout[c + r*8].name() != "Empty":
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,r,layout,surface))
+        else:
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,r])
+    while None in enemies:
+        enemies.remove(None)
+    return moves + enemies
+def rookMoveChecksMainPiece(self,x,y,layout,surface):
+    moves =[]
+    enemies =[]
+    enemyMoves = enemyMoveCheker(self,layout,None,None)
+    r = y
+    for c in range(x-1,-1,-1):
+        if(layout[c + y*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,y,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,y])
+    for c in range(x+1,8,+1):
+        if(layout[c + y*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,y,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,y])
+    for r in range(y+1,8,+1):
+        if(layout[x + r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,x,r,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([x,r])
+    for r in range(y-1,-1,-1):
+        if(layout[x + r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,x,r,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([x,r])
     r = y
     while None in enemies:
         enemies.remove(None)
