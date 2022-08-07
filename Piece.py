@@ -114,12 +114,7 @@ class king(piece):
                         enemies.append([x,y-1])
                 else:
                     moves.append([x,y-1])
-
-        #while None in enemies:
-         #   enemies.remove(None)
         moves += enemies
-        count = len(moves) -1
-        i = 0
         return moves
 
 class wKing(king):

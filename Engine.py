@@ -14,13 +14,13 @@ def move(layout,playerColor,wKing,bKing):
     i = 0
     for piece in layout:
         square = Piece.numToSquare(i)
-        if piece.color != playerColor and piece.validMoves(square[0],square[1],layout,surface):
+        if piece.color != playerColor and piece.thisPieceCanMove(square[0],square[1],layout,surface):
             pieces.append(piece)
             locs.append(i)
         i += 1
     mover = random.randint(0,len(pieces)-1)
     square = Piece.numToSquare(locs[mover])
-    moves = pieces[mover].validMoves(square[0],square[1],layout,surface)
+    moves = pieces[mover].thisPieceCanMove(square[0],square[1],layout,surface)
     move = moves[random.randint(0, len(moves)-1)]
     if pieces[mover].name() == "Pawn" and move[0] + move[1]*8 >= 56:
         layout[move[0]+move[1]*8] = bQueen
