@@ -15,6 +15,20 @@ bKingCheck = False
 wKingCheck = False
 circle = pygame.Surface((Radius*2, Radius*2), pygame.SRCALPHA)
 surface = None
+class enemyMoveListClass():
+    ## this class stores all the enemy moves, in an array keeping track of how many times the enemy can move to a given square
+    def __init__(self):
+        self.moves = []
+        for i in range(63):
+            self.moves.append(0)
+    def reset(self):
+        for i in range(63):
+            self.moves[i] = 0
+    def add(self,num):
+        self.moves[num] = self.moves[num] + 1
+    def find(self,num):
+        return self.moves[num]
+enemyMoveList = enemyMoveListClass()
 class piece():
     def __init__(self):
         self.color = None
@@ -26,6 +40,8 @@ class piece():
         return None
     def name(self):
         return None
+    def thisPieceCanMove(self,x,y,layout,surface):
+        return self.validMoves(x, y, layout, surface)
 
 
 ##king
@@ -142,13 +158,13 @@ class wPawn(pawn):
     def validMoves(self,x,y, layout,surface):
         moves = []
         #first chech if pawn has not yet moved by checking if in 7th row
-        if y == 6: 
+        if y == 6:
             if layout[x + 5*8].name() == "Empty":
                 moves.append([x,5])
                 if layout[x + 4*8].name() == "Empty":
                     moves.append([x,4])
         else: 
-             if layout[x + (y-1)*8].name() == "Empty":
+            if layout[x + (y-1)*8].name() == "Empty":
                 moves.append([x,y-1])
         return moves + self.killSpots(x,y,layout,surface)
     def killSpots(self,x,y,layout,surface):
@@ -269,6 +285,8 @@ class bishop(piece):
         return "Bishop"
     def validMoves(self,x,y,layout,surface):
         return diagonalChecks(self,x,y,layout,surface)
+    def thisPieceCanMove(self,x,y,layout,surface):
+        return diagonalChecksMainPiece(self, x, y, layout, surface)
 
 class wBishop(bishop):
     def __init__(self):
@@ -337,9 +355,9 @@ def diagonalChecks(self,x,y,layout,surface):
         r+=1
         if(r > 7):
             break
-        if(layout[c +r*8].name() != "Empty"):
-            enemies.append(enemyCheck(self,c,r,layout,surface))
-            break
+            if(layout[c +r*8].name() != "Empty"):
+                enemies.append(enemyCheck(self,c,r,layout,surface))
+                break
         moves.append([c,r])
 
     r = y
@@ -363,6 +381,53 @@ def diagonalChecks(self,x,y,layout,surface):
     while None in enemies:
         enemies.remove(None)
     return moves + enemies
+#only need to check the oppents moves for the piece that is clicked on, big optimization
+#cannot figure out how to maximaze efficency without re doing alot or reusing code, should have planned ahead and proofed for this
+def diagonalChecksMainPiece(self,x,y,layout,surface):
+    enemyMoves = None # enemyMoveCheker(self, layout, None,None)
+    moves = []
+    enemies = []
+    r = y
+    for c in range(x-1,-1,-1):
+        r-= 1
+        if(r < 0):
+            break
+        if(layout[c + r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves):  moves.append([c,r])
+    r = y
+    for c in range(x-1,-1,-1):
+        r+=1
+        if(r > 7):
+            break
+            if(layout[c +r*8].name() != "Empty"):
+                if safe(self,[c,r],[x,y],layout,surface,enenmyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
+                break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves): moves.append([c,r])
+
+    r = y
+    for c in range(x+1,8,+1):
+        r -=1
+        if(r < 0):
+            break
+        if(layout[c + r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves): moves.append([c,r])
+    r = y
+    for c in range(x+1,8,+1):
+        r +=1
+        if(r > 7):
+            break
+        if(layout[c + r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
+            break
+        if safe(self,[c,r],[x,y],layout,surface,enemyMoves): moves.append([c,r])
+    while None in enemies:
+        enemies.remove(None)
+    return moves + enemies
+
 
 def rookMoveChecks(self,x,y,layout,surface):
     moves =[]
@@ -484,7 +549,7 @@ def circlePlacer(array,color,layout,surface):
             hollowCircle(move[0],move[1])
 #takes the piece for color, but sends piece for future proofing since i antipate having a seperate check for king at some point
 #
-def enemyMoveCheker(self,layout,move,orgin):
+"""def enemyMoveCheker(self,layout,move,orgin):
     if move != None:
         layout = copy.copy(layout)
         layout[move[0] + move[1]*8] = layout[orgin[0] + orgin[1]*8]
@@ -526,19 +591,68 @@ def enemyMoveCheker(self,layout,move,orgin):
                 for move in tempMove:
                     enemyMoves.add(move[0]+move[1]*8)
         i+=1
-    return enemyMoves
+    return enemyMoves"""
+## original enemy move checker, for better efficency i will now create a hashmap so it keeps tack of times a square can be moved to 
+## this will greatly boost the efficency of checking legal moves
 
-def safe(piece,move,orgin,layoutCopy,surface):
+        
+#return array of times each square can be moved to by enemy, can also accept a move and orgin to check what will happen after a certain move
+def enemyMoveCheker(self,layout,move,orgin):
+    if move != None:
+        layout = copy.copy(layout)
+        layout[move[0] + move[1]*8] = layout[orgin[0] + orgin[1]*8]
+        layout[orgin[0] + orgin[1]*8] = emptyPiece()
+    enemyMoveList.reset()
+    i =0
+    for piece in layout:
+        if piece.color != self.color and piece.name() == "Pawn":
+            moves = piece.potentialKillSpots(numToSquare(i)[0],numToSquare(i)[1],layout,surface)
+            for move in moves:
+                enemyMoveList.add(move[0] + move[1]*8)
+        elif piece.color != self.color and piece.name() == "King":
+            # will get stuck in loop, does not allow king to move withing one square of the other king
+            moves = []
+            square = numToSquare(i)
+            x = square[0]
+            y = square[1]
+            if x < 7:
+                if y < 7:
+                    moves.append([x+1,y+1])
+                if y > 0:
+                    moves.append([x+1,y-1])
+                moves.append([x+1,y])
+            if x > 0:
+                if y < 7:
+                    moves.append([x-1,y+1])
+                if y > 0:
+                    moves.append([x-1,y-1])
+                moves.append([x-1,y])
+            if y < 7:
+                moves.append([x,y+1]) 
+            if y > 0:
+                moves.append([x,y-1])
+            for move in moves:
+                enemyMoveList.add(move[0]+move[1]*8)
+        elif piece.color != self.color:
+            square = numToSquare(i)
+            tempMove = piece.validMoves(square[0],square[1],layout,surface)
+            if tempMove:
+                for move in tempMove:
+                    enemyMoveList.add(move[0]+move[1]*8)
+        i+=1
+    return enemyMoveList.moves
+def safe(piece,move,orgin,layoutCopy,surface,enemies):
+    if enemies == None:
+        enemies = enemyMoveCheker(piece, layoutCopy,move,orgin)
     layout =  copy.copy(layoutCopy)
     #creating a tempory layout to check if the king is safe from check after this move
     layout[orgin[0] + orgin[1]*8] = emptyPiece()
     layout[move[0] + move[1]*8] = piece
-    enemies = enemyMoveCheker(piece, layout,move,orgin)
     if piece.color == white:
-        if wKingSquare in enemies:
+        if enemies[wKingSquare] != 0:
             return False
         return True
-    if bKingSquare in enemies:
+    if enemies[bKingSquare] != 0:
         return False
     return True
 def safeForKingMove(piece,move,orgin,layoutCopy,surface):
@@ -547,11 +661,11 @@ def safeForKingMove(piece,move,orgin,layoutCopy,surface):
     #print(enemies,wKingSquare,move)
     #creating a tempory layout to check if the king is safe from check after this move
     if piece.color == white:
-        if (move[0]+move[1]*8) in enemies:
+        if enemies[move[0]+move[1]*8] != 0:
             return False
         #print(True)
         return True
-    if (move[0]+move[1]*8) in enemies:
+    if enemies[move[0]+move[1]*8] != 0:
         return False
     return True
 def bKingMove(num):

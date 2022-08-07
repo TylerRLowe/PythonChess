@@ -86,7 +86,7 @@ def main():
                         board.create(hasPieceSelected,[x,y])
                         selectedPiece = board.layout[x+y*8]
                         selectedPieceLocation = [x,y]
-                    elif hasPieceSelected and [x,y] in selectedPiece.validMoves(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
+                    elif hasPieceSelected and [x,y] in selectedPiece.thisPieceCanMove(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
                         playerTurn = False
                         hasPieceSelected = False
                         board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
@@ -97,7 +97,7 @@ def main():
                         board.layout[x + y*8] = selectedPiece
                         if selectedPiece.name() == "King":
                             Piece.wKingMove(x+y*8)
-                        if Piece.bKingSquare in board.layout[x+y*8].validMoves(x,y,board.layout,surface):
+                        if Piece.bKingSquare in board.layout[x+y*8].thisPieceCanMove(x,y,board.layout,surface):
                             piece.bKingCheck = True
                         if selectedPiece.name() == "King":
                             Piece.wKingSquare = x + y*8

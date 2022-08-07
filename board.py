@@ -33,7 +33,7 @@ class board:
             xSquare = pieceSelectedLocation[0]
             ySquare = pieceSelectedLocation[1]
             pygame.draw.rect(self.surface,lightBlue,(xSquare*75,ySquare*75,75,75))
-            moves = self.layout[xSquare+ySquare*8].validMoves(xSquare,ySquare,self.layout,self.surface)
+            moves = self.layout[xSquare+ySquare*8].thisPieceCanMove(xSquare,ySquare,self.layout,self.surface)
             Piece.circlePlacer(moves,self.layout[xSquare + ySquare*8].color,self.layout,self.surface)          
         self.populate()
          ##placing the pieces
