@@ -393,9 +393,9 @@ def diagonalChecks(self,x,y,layout,surface):
         r+=1
         if(r > 7):
             break
-            if(layout[c +r*8].name() != "Empty"):
-                enemies.append(enemyCheck(self,c,r,layout,surface))
-                break
+        if(layout[c +r*8].name() != "Empty"):
+            enemies.append(enemyCheck(self,c,r,layout,surface))
+            break
         moves.append([c,r])
 
     r = y
@@ -439,9 +439,9 @@ def diagonalChecksMainPiece(self,x,y,layout,surface):
         r+=1
         if(r > 7):
             break
-            if(layout[c +r*8].name() != "Empty"):
-                if safe(self,[c,r],[x,y],layout,surface,enenmyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
-                break
+        if(layout[c +r*8].name() != "Empty"):
+            if safe(self,[c,r],[x,y],layout,surface,enemyMoves): enemies.append(enemyCheck(self,c,r,layout,surface))
+            break
         if safe(self,[c,r],[x,y],layout,surface,enemyMoves): moves.append([c,r])
 
     r = y
