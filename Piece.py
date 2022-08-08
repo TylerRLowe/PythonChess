@@ -181,7 +181,7 @@ class wPawn(pawn):
                 moves.append([x-1,y-1])
         return moves
     def thisPieceCanMove(self,x,y,layout,surface,enemies):
-        enemies = enemyMoveCheker(self,layout,None,None)
+        enemies = None
         moves = []
         #first chech if pawn has not yet moved by checking if in 7th row
         if y == 6:
@@ -238,7 +238,7 @@ class bPawn(pawn):
         return moves
     def thisPieceCanMove(self,x,y,layout,surface,enemies):
         moves = []
-        enemies = enemyMoveCheker(self,layout,None,None)
+        enemies = None
         if y == 1: 
             if layout[x + 2*8].name() == "Empty":
                 if safe(self,[x,2],[x,y],layout,surface,enemies): moves.append([x,2])
@@ -562,7 +562,7 @@ def knightMoves(self,x,y,layout,surface):
 def knightMovesMainPiece(self,x,y,layout,surface):
     moves =[]
     enemies = []
-    enemyMoves = enemyMoveCheker(self,layout,None,None)
+    enemyMoves = None
     c = x+1
     r = y+2
     if c < 8 and r < 8:
@@ -625,7 +625,7 @@ def knightMovesMainPiece(self,x,y,layout,surface):
 def rookMoveChecksMainPiece(self,x,y,layout,surface):
     moves =[]
     enemies =[]
-    enemyMoves = enemyMoveCheker(self,layout,None,None)
+    enemyMoves = None
     r = y
     for c in range(x-1,-1,-1):
         if(layout[c + y*8].name() != "Empty"):
@@ -637,6 +637,7 @@ def rookMoveChecksMainPiece(self,x,y,layout,surface):
             if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,c,y,layout,surface))
             break
         if safe(self,[c,r],[x,y],layout,surface,enemyMoves):moves.append([c,y])
+    c = x
     for r in range(y+1,8,+1):
         if(layout[x + r*8].name() != "Empty"):
             if safe(self,[c,r],[x,y],layout,surface,enemyMoves):enemies.append(enemyCheck(self,x,r,layout,surface))
