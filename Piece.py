@@ -40,7 +40,7 @@ class piece():
         return None
     def name(self):
         return None
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         return self.validMoves(x, y, layout, surface)
 
 
@@ -180,7 +180,7 @@ class wPawn(pawn):
             if x > 0:
                 moves.append([x-1,y-1])
         return moves
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         enemies = enemyMoveCheker(self,layout,None,None)
         moves = []
         #first chech if pawn has not yet moved by checking if in 7th row
@@ -236,7 +236,7 @@ class bPawn(pawn):
             if x > 0:
                 moves.append([x-1,y+1])
         return moves
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         moves = []
         enemies = enemyMoveCheker(self,layout,None,None)
         if y == 1: 
@@ -247,10 +247,11 @@ class bPawn(pawn):
         else: 
             if layout[x + (y+1)*8].name() == "Empty":
                 if safe(self,[x,y+1],[x,y],layout,surface,enemies): moves.append([x,y+1])
-        if y < 7:
-            if x < 7:
+        if x < 7:
+            if layout[x+1 + (y+1)*8].name() != "Empty" and (layout[x+1 + (y+1)*8].color != self.color):
                 if safe(self,[x+1,y+1],[x,y],layout,surface,enemies): moves.append([x+1,y+1])
-            if x > 0:
+        if x > 0:
+            if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
                 if safe(self,[x-1,y+1],[x,y],layout,surface,enemies): moves.append([x-1,y+1])
         return moves
         
@@ -268,7 +269,7 @@ class rook(piece):
         return "Rook"
     def validMoves(self,x,y,layout,surface):
         return rookMoveChecks(self,x,y,layout,surface)
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         return rookMoveChecksMainPiece(self, x, y, layout, surface)
 
 class wRook(rook):
@@ -295,7 +296,7 @@ class queen(piece):
         return "Queen"
     def validMoves(self,x,y,layout,surface):
         return diagonalChecks(self,x,y,layout,surface) + rookMoveChecks(self,x,y,layout,surface)
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         return diagonalChecksMainPiece(self, x, y, layout, surface) + rookMoveChecksMainPiece(self,x,y,layout,surface)
 
 class wQueen(queen):
@@ -321,7 +322,7 @@ class bishop(piece):
         return "Bishop"
     def validMoves(self,x,y,layout,surface):
         return diagonalChecks(self,x,y,layout,surface)
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         return diagonalChecksMainPiece(self, x, y, layout, surface)
 
 class wBishop(bishop):
@@ -347,7 +348,7 @@ class knight(piece):
         return "Knight"
     def validMoves(self,x,y,layout,sruface):
         return knightMoves(self,x,y,layout,surface)
-    def thisPieceCanMove(self,x,y,layout,surface):
+    def thisPieceCanMove(self,x,y,layout,surface,enemies):
         return knightMovesMainPiece(self, x, y, layout, surface)
 
 class wKnight(knight):

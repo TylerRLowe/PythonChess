@@ -8,6 +8,11 @@ green = pygame.Color(0,80,0)
 lightBlue = pygame.Color(0,50,200)
 blue = pygame.Color(72,166,255)
 grey = pygame.Color(84,84,84,200)
+pygame.init()
+font = pygame.font.Font(None, 70)
+text = font.render('White wins: checkMate', True, pygame.Color(0,0,0), pygame.Color(255,255,255))
+textRect = text.get_rect()
+textRect.center = (300,300)
 class board:
     def __init__(self,surface):
         self.surface = surface
@@ -33,7 +38,7 @@ class board:
             xSquare = pieceSelectedLocation[0]
             ySquare = pieceSelectedLocation[1]
             pygame.draw.rect(self.surface,lightBlue,(xSquare*75,ySquare*75,75,75))
-            moves = self.layout[xSquare+ySquare*8].thisPieceCanMove(xSquare,ySquare,self.layout,self.surface)
+            moves = self.layout[xSquare+ySquare*8].thisPieceCanMove(xSquare,ySquare,self.layout,self.surface,None)
             Piece.circlePlacer(moves,self.layout[xSquare + ySquare*8].color,self.layout,self.surface)          
         self.populate()
          ##placing the pieces
@@ -46,3 +51,5 @@ class board:
             if(x == 600):
                 x = 0 
                 y +=75
+    def comCheckMate(self):
+        self.surface.blit(text, textRect)

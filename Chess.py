@@ -22,6 +22,10 @@ FramePerSec = pygame.time.Clock()
 hasPieceSelected= False
 playerTurn = True
 check = False
+font = pygame.font.Font('freesansbold.ttf', 32)
+text = font.render('CheckMate', True, pygame.Color(0,0,0), pygame.Color(255,255,255))
+textRect = text.get_rect()
+textRect.center = (350,350)
 # pices
 Radius = 25
 circle = pygame.Surface((Radius*2, Radius*2), pygame.SRCALPHA)
@@ -39,6 +43,7 @@ wQueen = Piece.wQueen()
 wKing = Piece.wKing()
 wPawn = Piece.wPawn()      
 board = board.board(surface)  
+Piece.surface = surface
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
     board.layout.append(bPawn)
@@ -51,7 +56,7 @@ board.layout += [wRook,wKnight,wBishop,wQueen,wKing,wBishop,wKnight,wRook]
 ##game
 piece = empty
 board.create(hasPieceSelected,[])
-
+font = pygame.font.Font('freesansbold.ttf', 32)
 playing = True
 def main():
     hasPieceSelected= False
@@ -72,6 +77,10 @@ def main():
             #this allows accsess to the underlying array
             if playerTurn == False:
                 board.layout = Engine.move(board.layout,playerColor,wKing,bKing)
+                if board.layout == "error":
+                    board.comCheckMate()
+                    pygame.display.update()
+                    pause()
                 board.create(hasPieceSelected,selectedPieceLocation)
                 playerTurn = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -86,7 +95,7 @@ def main():
                         board.create(hasPieceSelected,[x,y])
                         selectedPiece = board.layout[x+y*8]
                         selectedPieceLocation = [x,y]
-                    elif hasPieceSelected and [x,y] in selectedPiece.thisPieceCanMove(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface):
+                    elif hasPieceSelected and [x,y] in selectedPiece.thisPieceCanMove(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface,None):
                         playerTurn = False
                         hasPieceSelected = False
                         board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
@@ -97,7 +106,7 @@ def main():
                         board.layout[x + y*8] = selectedPiece
                         if selectedPiece.name() == "King":
                             Piece.wKingMove(x+y*8)
-                        if Piece.bKingSquare in board.layout[x+y*8].thisPieceCanMove(x,y,board.layout,surface):
+                        if Piece.bKingSquare in board.layout[x+y*8].thisPieceCanMove(x,y,board.layout,surface,None):
                             piece.bKingCheck = True
                         if selectedPiece.name() == "King":
                             Piece.wKingSquare = x + y*8
@@ -115,6 +124,11 @@ def main():
         
         FramePerSec.tick(FPS)
 
+def pause():
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
 
 if __name__ == "__main__":
     main()
