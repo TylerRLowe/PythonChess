@@ -10,7 +10,7 @@ blue = pygame.Color(72,166,255)
 grey = pygame.Color(84,84,84,200)
 pygame.init()
 font = pygame.font.Font(None, 70)
-text = font.render('White wins: checkMate', True, pygame.Color(0,0,0), pygame.Color(255,255,255))
+text = font.render('White wins: checkmate', True, pygame.Color(0,0,0), pygame.Color(255,255,255))
 textRect = text.get_rect()
 textRect.center = (300,300)
 class board:
