@@ -4,8 +4,8 @@ import pygame
 import Piece
 import board
 import random
-import binarytree
 import time
+import copy
 pygame.init()
 empty = Piece.emptyPiece()
 bQueen = Piece.bQueen()
@@ -21,8 +21,7 @@ def move(layout,playerColor,wKing,bKing):
         if piece.color != playerColor and piece.name() != "Empty":
             moves[i] = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,enemies)
             if not moves[i]: moves.pop(i,None)
-        i += 1
-    evaluation()
+            i += 1
     keys = list(moves.keys())
     if not moves or not keys: 
         return "error"
@@ -41,10 +40,10 @@ def move(layout,playerColor,wKing,bKing):
     layout[movingPieceLocation] = empty
     return(layout)
 
-def evaluation():
-    return
+def evaluation(moves):
     start = time.time()
     for move in moves:
-        templayout = copy.copy(layout)
+        pass
+    return
     while time.time() - start < 10:
         pass
