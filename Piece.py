@@ -343,7 +343,7 @@ class bBishop(bishop):
 class knight(piece):
     def __init__(self):
         super().__init__()
-        value = 3
+        self.value = 3
     def name(self):
         return "Knight"
     def validMoves(self,x,y,layout,sruface):

@@ -23,6 +23,7 @@ def move(layout,playerColor,wKing,bKing):
             if not moves[i]: moves.pop(i,None)
             i += 1
     keys = list(moves.keys())
+
     if not moves or not keys: 
         return "error"
     movingPieceLocation = keys[random.randint(0,len(moves)-1)]
@@ -33,9 +34,12 @@ def move(layout,playerColor,wKing,bKing):
         layout[move[0]+move[1]*8] = bQueen
     else:
         layout[move[0]+move[1]*8] = movingPiece
-    if movingPiece.name() == "King":    
+    if piece.name == "Empty":
+        pass
+    elif movingPiece.name() == "King":    
         Piece.bKingSquare = move[0] + move[1] * 8
-    if Piece.numToSquare(Piece.wKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
+    #these can be seperate as the king can never check the other king
+    elif Piece.numToSquare(Piece.wKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
         Piece.wKingCheck= True
     layout[movingPieceLocation] = empty
     return(layout)
@@ -47,3 +51,8 @@ def evaluation(moves):
     return
     while time.time() - start < 10:
         pass
+#takes the original layout, the move being made, and the piece
+#edits and returns the
+def boardChanger(layout,piece,move):
+    newLayout = copy.copy(layout)
+    return newLayout
