@@ -19,13 +19,14 @@ class enemyMoveListClass():
     ## this class stores all the enemy moves, in an array keeping track of how many times the enemy can move to a given square
     def __init__(self):
         self.moves = []
-        for i in range(63):
+        for i in range(64):
             self.moves.append(0)
     def reset(self):
         for i in range(63):
             self.moves[i] = 0
     def add(self,num):
-        self.moves[num] = self.moves[num] + 1
+        if(num < 64 and num > -1):
+            self.moves[num] = self.moves[num] + 1
     def find(self,num):
         return self.moves[num]
 enemyMoveList = enemyMoveListClass()

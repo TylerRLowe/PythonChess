@@ -6,6 +6,7 @@ import board
 import random
 import time
 import copy
+import MoveHolder
 pygame.init()
 empty = Piece.emptyPiece()
 bQueen = Piece.bQueen()
@@ -44,6 +45,7 @@ def move(layout,playerColor,wKing,bKing):
     return(layout)
 
 def evaluation(layout,color,wKing,bKing):
+    depth = 1
     start = time.time()
     bestLayout = layout
     i = 0
@@ -55,14 +57,17 @@ def evaluation(layout,color,wKing,bKing):
             moves = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,None)
             for move in moves:
                 tempLayout = boardChanger(layout, piece,i, move)
-                if board.score(tempLayout,color)>= board.score(bestLayout,color):
+                value = board.score(tempLayout,color)
+                MoveHolder.moveAdder(move,value)
+                if value >= board.score(bestLayout,color):
                     bestLayout = tempLayout
         i +=1
-        
+    depth += 1
     return bestLayout
     while time.time() - start < 10:
         pass
-
+def playerEvaluation(layout,color,wKing,bKing):
+    pass
 #takes the original layout, the move being made, and the piece
 #edits and returns the
 def boardChanger(layout,movingPiece,movingPieceLocation,move):
