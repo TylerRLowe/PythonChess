@@ -48,8 +48,9 @@ lateKingPoints = [-.50,-.40,-.30,-.20,-.20,-.30,-.40,-.50,
 class board:
     def __init__(self,surface):
         self.surface = surface
-        self.whiteScore = 1039.2
-        self.blackScore = 1039.2
+        self.whiteValue = 1039.2
+        self.blackValue = 1039.2
+
     def layout(self):
         pass
     def create(self,hasPieceSelected,pieceSelectedLocation):
@@ -75,8 +76,6 @@ class board:
             moves = self.layout[xSquare+ySquare*8].thisPieceCanMove(xSquare,ySquare,self.layout,self.surface,None)
             Piece.circlePlacer(moves,self.layout[xSquare + ySquare*8].color,self.layout,self.surface)          
         self.populate()
-        self.score()
-        print(self.whiteScore,self.blackScore)
          ##placing the pieces
     def populate(self):
         x=0
@@ -89,41 +88,41 @@ class board:
                 y +=75
     def comCheckMate(self):
         self.surface.blit(text, textRect)
-    def score(self):
-        #this can be called to iterate through the board and find the vlaue of each piece
-        #will probably instead manually change the score of the layout when the computer moves for search purposes
-        #after more thinking this may be a useless method but atleaast i can use it at the start to avoid
-        #manually calculating
-        whiteScore = 0
-        blackScore = 0
-        pointsWhiteKingSquare = 0 
-        i = 0
-        pointsBlackKingSquare = 0
-        for piece in self.layout:
-            if piece.name() == "Empty":
-                pass
-            elif piece.color == white:
-                if piece.name() == "Knight":
-                    whiteScore += knightPoints[i]
-                elif piece.name() == "Pawn":
-                    whiteScore += whitePawnPoints[i]
-                elif piece.name() == "King":
-                    pointsWhiteKingSquare = i
-                whiteScore += piece.value
-            elif piece.color == black:
-                if piece.name() == "Knight":
-                    blackScore += knightPoints[i]
-                elif piece.name() == "Pawn":
-                    blackScore += whitePawnPoints[63-i]
-                elif piece.name() == "King":
-                    pointsBlackKingSquare = i
-                blackScore += piece.value
-            i +=1
-        if blackScore + whiteScore < 40:
-            blackScore += lateKingPoints[63-pointsBlackKingSquare]
-            whiteScore += lateKingPoints[pointsWhiteKingSquare]
-        else:
-            blackScore += kingPoints[63-pointsBlackKingSquare]
-            whiteScore += kingPoints[pointsWhiteKingSquare]
-        self.whiteScore = whiteScore
-        self.blackScore = blackScore
+def score(layout,color):
+    #this can be called to iterate through the board and find the vlaue of each piece
+    #will probably instead manually change the score of the layout when the computer moves for search purposes
+    #after more thinking this may be a useless method but atleaast i can use it at the start to avoid
+    #manually calculating
+    whiteScore = 0
+    blackScore = 0
+    pointsWhiteKingSquare = 0 
+    i = 0
+    pointsBlackKingSquare = 0
+    for piece in layout:
+        if piece.name() == "Empty":
+            pass
+        elif piece.color == white:
+            if piece.name() == "Knight":
+                whiteScore += knightPoints[i]
+            elif piece.name() == "Pawn":
+                whiteScore += whitePawnPoints[i]
+            elif piece.name() == "King":
+                pointsWhiteKingSquare = i
+            whiteScore += piece.value
+        elif piece.color == black:
+            if piece.name() == "Knight":
+                blackScore += knightPoints[i]
+            elif piece.name() == "Pawn":
+                blackScore += whitePawnPoints[63-i]
+            elif piece.name() == "King":
+                pointsBlackKingSquare = i
+            blackScore += piece.value
+        i +=1
+    if blackScore + whiteScore < 40:
+        blackScore += lateKingPoints[63-pointsBlackKingSquare]
+        whiteScore += lateKingPoints[pointsWhiteKingSquare]
+    else:
+        blackScore += kingPoints[63-pointsBlackKingSquare]
+        whiteScore += kingPoints[pointsWhiteKingSquare]
+    if color == black:
+        return blackScore - whiteScore

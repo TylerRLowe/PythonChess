@@ -10,6 +10,8 @@ pygame.init()
 empty = Piece.emptyPiece()
 bQueen = Piece.bQueen()
 def move(layout,playerColor,wKing,bKing):
+    return(evaluation(layout,bKing.color,wKing,bKing))
+    
     moves ={}
     #keeps track of black pieces and their locations in the array
     #this is used to find the piece later, for ex the piece at pieces[1] index in the main layout
@@ -34,25 +36,44 @@ def move(layout,playerColor,wKing,bKing):
         layout[move[0]+move[1]*8] = bQueen
     else:
         layout[move[0]+move[1]*8] = movingPiece
-    if piece.name == "Empty":
-        pass
-    elif movingPiece.name() == "King":    
+    if movingPiece.name() == "King":    
         Piece.bKingSquare = move[0] + move[1] * 8
-    #these can be seperate as the king can never check the other king
-    elif Piece.numToSquare(Piece.wKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
+    if Piece.numToSquare(Piece.wKingSquare) in layout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
         Piece.wKingCheck= True
     layout[movingPieceLocation] = empty
     return(layout)
 
-def evaluation(moves):
+def evaluation(layout,color,wKing,bKing):
     start = time.time()
-    for move in moves:
-        pass
-    return
+    bestLayout = layout
+    i = 0
+    for piece in layout:
+        square = Piece.numToSquare(i)
+        if piece.color != color:
+            pass
+        else:
+            moves = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,None)
+            for move in moves:
+                tempLayout = boardChanger(layout, piece,i, move)
+                if board.score(tempLayout,color)>= board.score(bestLayout,color):
+                    bestLayout = tempLayout
+        i +=1
+        
+    return bestLayout
     while time.time() - start < 10:
         pass
+
 #takes the original layout, the move being made, and the piece
 #edits and returns the
-def boardChanger(layout,piece,move):
+def boardChanger(layout,movingPiece,movingPieceLocation,move):
     newLayout = copy.copy(layout)
+    if movingPiece.name() == "Pawn" and move[0] + move[1]*8 >= 56:
+        newLayout[move[0]+move[1]*8] = bQueen
+    else:
+        newLayout[move[0]+move[1]*8] = movingPiece
+    if movingPiece.name() == "King":    
+        Piece.bKingSquare = move[0] + move[1] * 8
+    if Piece.numToSquare(Piece.wKingSquare) in newLayout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
+        Piece.wKingCheck= True
+    newLayout[movingPieceLocation] = empty
     return newLayout
