@@ -89,7 +89,6 @@ def playerEvaluation(layout,color,wKing,bKing):
     x = 0
     bestLayout = layout
     bestValue = -1000
-    print(moves)
     for move in moves:
         tempLayout = boardChanger(layout, move.piece, move.location, move.move)
         if move.piece.color != color:
@@ -110,7 +109,6 @@ def playerEvaluation(layout,color,wKing,bKing):
                 elif continueChecking == False:
                     #if there is a better move white can make, can immediatly break the loop without checking the rest
                     break
-    print(x)
     return bestLayout
                 
 

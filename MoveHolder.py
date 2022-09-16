@@ -20,7 +20,7 @@ def moveAdder(playerMove,piece,location,value):
     if(allMoves[value] == None):
         allMoves[value] = move
     else:
-        allMoves[value].next = allMoves[value]
+        move.next = allMoves[value]
         allMoves[value] = move
    
 class moves():
