@@ -44,6 +44,8 @@ wKing = Piece.wKing()
 wPawn = Piece.wPawn()      
 board = board.board(surface)  
 Piece.surface = surface
+#layout could be 2d array to more easily convert to squares, but harder to traverse
+#I went with 1d array, but in hindsight a 2d array may be easier to deal with
 board.layout = [bRook,bKnight,bBishop,bQueen,bKing,bBishop,bKnight,bRook]
 for i in range(8):
     board.layout.append(bPawn)

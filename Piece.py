@@ -50,7 +50,7 @@ class piece():
 class king(piece):
     def __init__(self):
         super().__init__()
-        self.value = 0
+        self.value = 50
         #self.value = 1000
     def name(self):
         return "King"

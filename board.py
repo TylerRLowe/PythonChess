@@ -1,6 +1,9 @@
 #the piece can by found in the array by using board.layout[x+y*8] when represents the square\
 import pygame
 import Piece
+emptyLayout = []
+for i in range(64):
+    emptyLayout.append(Piece.wQueen())
 white = pygame.Color(255,255,255)
 black = pygame.Color(0,0,0)
 cream = pygame.Color(235,230,208)
@@ -48,8 +51,12 @@ lateKingPoints = [-.50,-.40,-.30,-.20,-.20,-.30,-.40,-.50,
 class board:
     def __init__(self,surface):
         self.surface = surface
-        self.whiteValue = 1039.2
-        self.blackValue = 1039.2
+        self.whiteValue = 89.1
+        self.blackValue = 89.1
+        self.layout
+        emptyLayout = []
+        for i in range(64):
+            emptyLayout.append(Piece.emptyPiece())
 
     def layout(self):
         pass
@@ -126,3 +133,5 @@ def score(layout,color):
         whiteScore += kingPoints[pointsWhiteKingSquare]
     if color == black:
         return blackScore - whiteScore
+    else:
+        return whiteScore - blackScore
