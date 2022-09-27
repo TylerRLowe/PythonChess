@@ -203,7 +203,6 @@ class wPawn(pawn):
                     if safe(self,[x+1,y-1],[x,y],layout,surface,enemies):moves.append([x-1,y-1])
         return moves
 
-#wPawn = wPawn()
 class bPawn(pawn):
     def __init__(self):
         super().__init__()
@@ -244,6 +243,7 @@ class bPawn(pawn):
         if y == 1: 
             if layout[x + 2*8].name() == "Empty":
                 if safe(self,[x,2],[x,y],layout,surface,enemies): moves.append([x,2])
+                if x == 3: print(safe(self,[x,2],[x,y],layout,surface,enemies),enemies)
                 if layout[x + 3*8].name() == "Empty":
                     if safe(self,[x,3],[x,y],layout,surface,enemies): moves.append([x,3])
         else: 
@@ -255,6 +255,7 @@ class bPawn(pawn):
         if x > 0:
             if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
                 if safe(self,[x-1,y+1],[x,y],layout,surface,enemies): moves.append([x-1,y+1])
+        if x==3: print(moves,"PIECE")
         return moves
         
 
@@ -839,13 +840,14 @@ def enemyMoveCheker(self,layout,move,orgin):
                     enemyMoveList.add(move[0]+move[1]*8)
         i+=1
     return enemyMoveList.moves
-def safe(piece,move,orgin,layoutCopy,surface,enemies):
+def safe(piece,move,orgin,layout,surface,enemies):
+    #passing in enemies is only down when checking moves, would save time to check once
     if enemies == None:
-        enemies = enemyMoveCheker(piece, layoutCopy,move,orgin)
-    layout =  copy.copy(layoutCopy)
+        enemies = enemyMoveCheker(piece, layout,move,orgin)
+    copyLayout =  copy.copy(layout)
     #creating a tempory layout to check if the king is safe from check after this move
-    layout[orgin[0] + orgin[1]*8] = emptyPiece()
-    layout[move[0] + move[1]*8] = piece
+    copyLayout[orgin[0] + orgin[1]*8] = emptyPiece()
+    copyLayout[move[0] + move[1]*8] = piece
     if piece.color == white:
         if enemies[wKingSquare] != 0:
             return False
@@ -856,12 +858,10 @@ def safe(piece,move,orgin,layoutCopy,surface,enemies):
 def safeForKingMove(piece,move,orgin,layoutCopy,surface):
     layout =  copy.copy(layoutCopy)
     enemies = enemyMoveCheker(piece, layout,move,orgin)
-    #print(enemies,wKingSquare,move)
     #creating a tempory layout to check if the king is safe from check after this move
     if piece.color == white:
         if enemies[move[0]+move[1]*8] != 0:
             return False
-        #print(True)
         return True
     if enemies[move[0]+move[1]*8] != 0:
         return False

@@ -27,7 +27,7 @@ def move(layout,playerColor,wKing,bKing):
     for piece in layout:
         square = Piece.numToSquare(i)
         if piece.color != playerColor and piece.name() != "Empty":
-            moves[i] = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,enemies)
+            moves[i] = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,enemies) 
             if not moves[i]: moves.pop(i,None)
             i += 1
     keys = list(moves.keys())
@@ -55,60 +55,87 @@ def evaluation(layout,color,wKing,bKing):
     bestLayout = board.emptyLayout
     i = 0
     x = 0
+    #keeps track of where the king should actually be as it is altered each use of board changer
+    trueBKing = Piece.bKingSquare
+    trueWKing = Piece.wKingSquare
     for piece in layout:
         square = Piece.numToSquare(i)
         if piece.color != color:
             pass
         else:
+            #resseting the square
+            Piece.bKingSquare = trueBKing
+            Piece.wKingSquare = trueWKing
             #looking at all moves for the piece, and finding out which one gives the best value
             moves = piece.thisPieceCanMove(square[0],square[1],layout,Piece.surface,None)
             for move in moves:
                 x += 1
                 tempLayout = boardChanger(layout, piece,i, move)
                 value = board.score(tempLayout,color)
-                MoveHolder.moveAdder(move,piece,i,value)
+                #finds the value of each position, adds to a move holder to we can look at them in order
+                MoveHolder.moveAdder(move,piece,i,value,Piece.bKingSquare,Piece.wKingSquare)
                 if value >= board.score(bestLayout,color):
+                    #if the value is > the the best layout, it replaces it as best layout
                     bestLayout = tempLayout
         i +=1
-    depth += 1
+    Piece.bKingSquare = trueBKing
+    #checking the player moves to check what will happen next
     if color == black:
-        playerEvaluation(layout, black, wKing, bKing)
+        return playerEvaluation(layout, white, wKing, bKing)
     else:
-        playerEvaluation(layout, white, wKing, bKing)
+        return playerEvaluation(layout, black, wKing, bKing)
 
-    return bestLayout
     while time.time() - start < 10:
         pass
 #evaluating the other way, this time finding the best move the player can do
 #evauliting step by step should allow me to evaulate positions in
 #an order that will hopefully cut down on the number of positions evauluated rather then going to a set depth
 def playerEvaluation(layout,color,wKing,bKing):
-    moves = MoveHolder.MoveHolder()
+    moves = MoveHolder.moveHolder()
     MoveHolder.clear()
-    i = 0
-    x = 0
-    bestLayout = layout
+    bestLayout = board.emptyLayout
     bestValue = -1000
+    value = -10000
+    trueBKing = Piece.bKingSquare
+    trueWKing = Piece.wKingSquare
+    finalWKingSquare =0
+    finalBKingSquare =0
     for move in moves:
         tempLayout = boardChanger(layout, move.piece, move.location, move.move)
         if move.piece.color != color:
             pass
-        else:
-            #slightly altered version of the other evaluation, will get rid of moves faster
-            square =Piece.numToSquare(i)
-            playerMoves = move.piece.thisPieceCanMove(square[0],square[1],tempLayout,Piece.surface,None)
-            continueChecking = False
-            for playerMove in playerMoves:
-                judgingLayout = boardChanger(tempLayout, move.piece, move.location, playerMove)
-                value = -board.score(judgingLayout,color)
+        for i  in range(64):
+            piece = tempLayout[i]
+            if piece.name() == "Empty" or piece.color != white:
+                pass
+            else:
+                #slightly altered version of the other evaluation, will get rid of moves faster
+                square =Piece.numToSquare(i)
+                playerMoves = piece.thisPieceCanMove(square[0],square[1],tempLayout,Piece.surface,None)
+                continueChecking = False
+    
+                for playerMove in playerMoves:
+                    #resseting king square every move
+                    Piece.bKingSquare = move.bKing
+                    Piece.wKingSquare = move.wKing
+                    judgingLayout = boardChanger(tempLayout, tempLayout[i], i, playerMove)
+                    value =   - board.score(judgingLayout,color)
+                    if value > bestValue:
+                        #we need to continue checking the rest of the moves to see if there is somthing
+                        #better for the player to do, hence the contuinue checking flag
+                        continueChecking = True
+
+                    elif continueChecking == False:
+                        #if there is a better move white can make, can immediatly break the loop without checking the rest
+                        break
                 if value > bestValue:
-                    #we need to continue checking the rest of the moves to see if there is somthing
-                    #better for the player to do, hence the contuinue checking flag
+                    #This is needed to not update the best layout before we should
                     bestLayout = tempLayout
-                    continueChecking = True
-                elif continueChecking == False:
-                    #if there is a better move white can make, can immediatly break the loop without checking the rest
-                    break
+                    finalBKingSquare = move.bKing
+                    finalWKingSquare = move.wKing
+                    bestValue = value
+    Piece.bKingSquare = finalBKingSquare
+    Piece.wKingSquare = finalWKingSquare
     return bestLayout
                 
 
@@ -121,9 +148,12 @@ def boardChanger(layout,movingPiece,movingPieceLocation,move):
         newLayout[move[0]+move[1]*8] = bQueen
     else:
         newLayout[move[0]+move[1]*8] = movingPiece
-    if movingPiece.name() == "King":    
+    if movingPiece.name() == "King" and movingPiece.color == black:    
         Piece.bKingSquare = move[0] + move[1] * 8
-    if Piece.numToSquare(Piece.wKingSquare) in newLayout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
-        Piece.wKingCheck= True
+    elif movingPiece.name() == "King" and movingPiece.color == white:
+        Piece.wKingSquare = move[0] + move[1] * 8
+    #if Piece.numToSquare(Piece.wKingSquare) in newLayout[move[0]+move[1]*8].validMoves(move[0],move[1],layout,Piece.surface):
+     #   Piece.wKingCheck= True
     newLayout[movingPieceLocation] = empty
+    
     return newLayout
