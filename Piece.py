@@ -163,16 +163,18 @@ class wPawn(pawn):
         else: 
             if layout[x + (y-1)*8].name() == "Empty":
                 moves.append([x,y-1])
-        return moves + self.killSpots(x,y,layout,surface)
+        return moves + self.potentialKillSpots(x,y,layout,surface)
     def killSpots(self,x,y,layout,surface):
         moves =[]
         if y > 0:
             if x < 7:
                 if layout[x+1 + (y-1)*8].name() != "Empty" and (layout[x+1 + (y-1)*8].color != self.color):
-                    moves.append([x+1,y-1])
+                    if safe(self,[x+1,y-1],[x,y],layout,surface,None):
+                        moves.append([x+1,y-1])
             if x > 0:
                 if layout[x-1 + (y-1)*8].name() != "Empty" and (layout[x-1 + (y-1)*8].color != self.color):
-                    moves.append([x-1,y-1])
+                    if safe(self,[x-1,y-1],[x,y],layout,surface,None):
+                        moves.append([x-1,y-1])
         return moves
     def potentialKillSpots(self,x,y,layout,surface):
         moves =[]
@@ -201,7 +203,7 @@ class wPawn(pawn):
             if x > 0:
                 if layout[x-1 + (y-1)*8].name() != "Empty" and (layout[x-1 + (y-1)*8].color != self.color):
                     if safe(self,[x+1,y-1],[x,y],layout,surface,enemies):moves.append([x-1,y-1])
-        return moves
+        return moves + self.killSpots(x,y,layout,surface)
 
 class bPawn(pawn):
     def __init__(self):
@@ -213,10 +215,12 @@ class bPawn(pawn):
         if y < 7:
             if x < 7:
                 if layout[x+1 + (y+1)*8].name() != "Empty" and (layout[x+1 + (y+1)*8].color != self.color):
-                    moves.append([x+1,y+1])
+                    if safe(self,[x+1,y+1],[x,y],layout,surface,None):
+                        moves.append([x+1,y+1])
             if x > 0:
                 if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
-                    moves.append([x-1,y+1])
+                    if safe(self,[x-1,y+1],[x,y],layout,surface,None):
+                        moves.append([x-1,y+1])
         return moves
     def validMoves(self,x,y, layout,surface):
         moves = []
@@ -228,7 +232,7 @@ class bPawn(pawn):
         else: 
             if layout[x + (y+1)*8].name() == "Empty":
                 moves.append([x,y+1])
-        return moves + self.killSpots(x,y,layout,surface)
+        return moves + self.potentialKillSpots(x,y,layout,surface)
     def potentialKillSpots(self,x,y,layout,surface):
         moves = []
         if y < 7:
@@ -243,7 +247,6 @@ class bPawn(pawn):
         if y == 1: 
             if layout[x + 2*8].name() == "Empty":
                 if safe(self,[x,2],[x,y],layout,surface,enemies): moves.append([x,2])
-                if x == 3: print(safe(self,[x,2],[x,y],layout,surface,enemies),enemies)
                 if layout[x + 3*8].name() == "Empty":
                     if safe(self,[x,3],[x,y],layout,surface,enemies): moves.append([x,3])
         else: 
@@ -255,8 +258,7 @@ class bPawn(pawn):
         if x > 0:
             if layout[x-1 + (y+1)*8].name() != "Empty" and (layout[x-1 + (y+1)*8].color != self.color):
                 if safe(self,[x-1,y+1],[x,y],layout,surface,enemies): moves.append([x-1,y+1])
-        if x==3: print(moves,"PIECE")
-        return moves
+        return moves + self.killSpots(x,y,layout,surface)
         
 
 #bPawn = bPawn()

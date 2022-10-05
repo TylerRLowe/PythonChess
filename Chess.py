@@ -90,7 +90,7 @@ def main():
                     pass
                 else:
                     piece = board.layout[x + y*8]
-                    if piece.name() != "Empty" and piece.color == playerColor:
+                    if piece.name() != "Empty":#and piece.color == playerColor:
                         hasPieceSelected = True
                         #yellow square designates the square the person has selected; and will
                         #stay yellow untill they pick another square or complete a move
@@ -98,7 +98,7 @@ def main():
                         selectedPiece = board.layout[x+y*8]
                         selectedPieceLocation = [x,y]
                     elif hasPieceSelected and [x,y] in selectedPiece.thisPieceCanMove(selectedPieceLocation[0],selectedPieceLocation[1],board.layout,surface,None):
-                        playerTurn = False
+                        playerTurn = True
                         hasPieceSelected = False
                         board.layout[selectedPieceLocation[0]+selectedPieceLocation[1]*8] = empty
                         selectedPieceLocation=[]
