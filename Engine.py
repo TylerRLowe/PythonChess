@@ -1,5 +1,6 @@
 
 from distutils.log import error
+from sre_constants import JUMP
 import pygame
 import Piece
 import board
@@ -101,39 +102,50 @@ def playerEvaluation(layout,color,wKing,bKing):
     finalWKingSquare =0
     finalBKingSquare =0
     for move in moves:
+        #setting worst value to abitrary constant, so it is always reset on first run
+        worstValue = 1000
+        #badMove is used as we need to break out of two loops with an unsecsusful move
+        badMove = False
         tempLayout = boardChanger(layout, move.piece, move.location, move.move)
         if move.piece.color != color:
             pass
-        for i  in range(64):
-            piece = tempLayout[i]
+        for x  in range(64):
+            piece = tempLayout[x]
             if piece.name() == "Empty" or piece.color != white:
                 pass
             else:
                 #slightly altered version of the other evaluation, will get rid of moves faster
-                square =Piece.numToSquare(i)
+                square =Piece.numToSquare(x)
                 playerMoves = piece.thisPieceCanMove(square[0],square[1],tempLayout,Piece.surface,None)
-                continueChecking = False
-    
                 for playerMove in playerMoves:
                     #resseting king square every move
                     Piece.bKingSquare = move.bKing
                     Piece.wKingSquare = move.wKing
-                    judgingLayout = boardChanger(tempLayout, tempLayout[i], i, playerMove)
+                    judgingLayout = boardChanger(tempLayout, piece, x, playerMove)
+                    #inveriting the board score, should have made color invertable
                     value =   - board.score(judgingLayout,color)
                     if value > bestValue:
+                        if value < worstValue:
+                            worstValue = value
                         #we need to continue checking the rest of the moves to see if there is somthing
-                        #better for the player to do, hence the contuinue checking flag
-                        continueChecking = True
+                        #worst value keeping track of the worst case scenario
+                        
 
-                    elif continueChecking == False:
-                        #if there is a better move white can make, can immediatly break the loop without checking the rest
+                    else:
+                        #if there is a better move white can make, we do not have to check the rest of this pieces moves
+                        badMove = True
                         break
-                if value > bestValue:
-                    #This is needed to not update the best layout before we should
-                    bestLayout = tempLayout
-                    finalBKingSquare = move.bKing
-                    finalWKingSquare = move.wKing
-                    bestValue = value
+                if badMove:
+                        #if there is a better move white can make, we also dont have to check other pieces move
+                        break
+        if worstValue > bestValue and badMove == False:
+            
+            #This is needed to not update the best layout before we should
+            bestLayout = tempLayout
+            finalBKingSquare = move.bKing
+            finalWKingSquare = move.wKing
+            #setting the bset value to worst possibility
+            bestValue = worstValue
     Piece.bKingSquare = finalBKingSquare
     Piece.wKingSquare = finalWKingSquare
     return bestLayout
