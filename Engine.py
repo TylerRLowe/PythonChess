@@ -1,4 +1,3 @@
-
 from distutils.log import error
 from sre_constants import JUMP
 import pygame
@@ -16,8 +15,8 @@ grey = pygame.Color(84,84,84,200)
 pygame.init()
 empty = Piece.emptyPiece()
 bQueen = Piece.bQueen()
-def move(layout,playerColor,wKing,bKing):
-    return(evaluation(layout,bKing.color,wKing,bKing))
+def move(layout,playerColor):
+    return(evaluation(layout,black))
     
     moves ={}
     #keeps track of black pieces and their locations in the array
@@ -50,10 +49,11 @@ def move(layout,playerColor,wKing,bKing):
     layout[movingPieceLocation] = empty
     return(layout)
 
-def evaluation(layout,color,wKing,bKing):
+def evaluation(layout,color):
     depth = 1
+    moveHolder = MoveHolder.MoveHolder()
     start = time.time()
-    bestLayout = board.emptyLayout
+    bestLayout = board.emptyLayoutBlack
     i = 0
     x = 0
     #keeps track of where the king should actually be as it is altered each use of board changer
@@ -74,7 +74,7 @@ def evaluation(layout,color,wKing,bKing):
                 tempLayout = boardChanger(layout, piece,i, move)
                 value = board.score(tempLayout,color)
                 #finds the value of each position, adds to a move holder to we can look at them in order
-                MoveHolder.moveAdder(move,piece,i,value,Piece.bKingSquare,Piece.wKingSquare)
+                moveHolder.moveAdder(move,piece,i,value,Piece.bKingSquare,Piece.wKingSquare)
                 if value >= board.score(bestLayout,color):
                     #if the value is > the the best layout, it replaces it as best layout
                     bestLayout = tempLayout
@@ -82,19 +82,19 @@ def evaluation(layout,color,wKing,bKing):
     Piece.bKingSquare = trueBKing
     #checking the player moves to check what will happen next
     if color == black:
-        return playerEvaluation(layout, white, wKing, bKing)
+        return playerEvaluation(layout, white,moveHolder)
     else:
-        return playerEvaluation(layout, black, wKing, bKing)
+        return playerEvaluation(layout, black,moveHolder)
 
     while time.time() - start < 10:
         pass
 #evaluating the other way, this time finding the best move the player can do
 #evauliting step by step should allow me to evaulate positions in
 #an order that will hopefully cut down on the number of positions evauluated rather then going to a set depth
-def playerEvaluation(layout,color,wKing,bKing):
-    moves = MoveHolder.moveHolder()
-    MoveHolder.clear()
-    bestLayout = board.emptyLayout
+def playerEvaluation(layout,color,moveHolder):
+    moves = moveHolder.getter()
+    moveHolder.clear()
+    bestLayout = board.emptyLayoutBlack
     bestValue = -1000
     value = -10000
     trueBKing = Piece.bKingSquare

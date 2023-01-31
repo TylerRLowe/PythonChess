@@ -50,7 +50,7 @@ class piece():
 class king(piece):
     def __init__(self):
         super().__init__()
-        self.value = 50
+        self.value = 5000
         #self.value = 1000
     def name(self):
         return "King"
@@ -142,7 +142,7 @@ class bKing(king):
 class pawn(piece):
     def __init__(self):
         super().__init__()
-        self.value = 1
+        self.value = 100
     def name(self):
         return "Pawn"
 
@@ -269,7 +269,7 @@ class bPawn(pawn):
 class rook(piece):
     def __init__(self):
         super().__init__()
-        self.value = 5
+        self.value = 500
     def name(self):
         return "Rook"
     def validMoves(self,x,y,layout,surface):
@@ -296,7 +296,7 @@ class bRook(rook):
 class queen(piece):
     def __init__(self):
         super().__init__()
-        self.value = 10
+        self.value = 1000
     def name(self):
         return "Queen"
     def validMoves(self,x,y,layout,surface):
@@ -322,7 +322,7 @@ class bQueen(queen):
 class bishop(piece):
     def __init__(self):
         super().__init__()
-        self.value = 3
+        self.value = 300
     def name(self):
         return "Bishop"
     def validMoves(self,x,y,layout,surface):
@@ -348,7 +348,7 @@ class bBishop(bishop):
 class knight(piece):
     def __init__(self):
         super().__init__()
-        self.value = 3
+        self.value = 300
     def name(self):
         return "Knight"
     def validMoves(self,x,y,layout,sruface):
